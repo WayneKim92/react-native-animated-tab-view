@@ -1,14 +1,68 @@
-import { StyleSheet, View, Animated, Pressable } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Animated,
+  Pressable,
+  type NativeSyntheticEvent,
+} from 'react-native';
 import { CollapsibleStickyHeaderOnlyRN } from 'react-native-header-components';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import type { NativeScrollEvent } from 'react-native/Libraries/Components/ScrollView/ScrollView';
 
 export default function AppRN() {
   const animationScrollY = useRef(new Animated.Value(0)).current;
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
+  const [lastScrollY, setLastScrollY] = useState(0);
+  const toolbarTranslateY = useRef(new Animated.Value(0)).current;
+  const toolBarHeight = 50;
+  const [shouldToolBarDown, setShouldToolBarDown] = useState(false);
+
+  useEffect(() => {
+    if (shouldToolBarDown) {
+      Animated.timing(toolbarTranslateY, {
+        toValue: toolBarHeight,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(toolbarTranslateY, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: true,
+      }).start();
+    }
+  }, [shouldToolBarDown, toolbarTranslateY]);
 
   const onScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: animationScrollY } } }],
-    { useNativeDriver: true } // useNativeDriver을 사용하려면 Animated Component를 사용해야함
+    {
+      useNativeDriver: true,
+      listener: (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+        const currentScrollY = event.nativeEvent.contentOffset.y;
+        const deltaY = currentScrollY - lastScrollY; // Calculate deltaY
+        setLastScrollY(currentScrollY);
+
+        let direction = null;
+        if (deltaY < 0) {
+          direction = 'up';
+        } else if (deltaY > 0) {
+          direction = 'down';
+        }
+
+        if (
+          direction === 'up' &&
+          currentScrollY > 0 &&
+          currentScrollY < collapsibleHeaderHeight + 1
+        ) {
+          setShouldToolBarDown(false);
+          return;
+        }
+
+        if (direction !== null && currentScrollY > collapsibleHeaderHeight) {
+          setShouldToolBarDown(direction === 'up');
+        }
+      },
+    }
   );
 
   return (
@@ -61,14 +115,13 @@ export default function AppRN() {
         renderItem={({ index }) => {
           if (index === 0) {
             return (
-              <Pressable onPress={() => console.log('tool bar')}>
-                <Animated.View
-                  style={{
-                    backgroundColor: 'pink',
-                    height: 50,
-                  }}
-                />
-              </Pressable>
+              <Animated.View
+                style={{
+                  backgroundColor: 'pink',
+                  height: 50,
+                  transform: [{ translateY: toolbarTranslateY }],
+                }}
+              />
             );
           }
 
