@@ -1,9 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native';
-import {
-  CollapsibleStickyHeader,
-  REAnimatedFlatList,
-} from 'react-native-header-components';
-import {
+import { CollapsibleStickyHeader } from 'react-native-header-components';
+import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
 } from 'react-native-reanimated';
@@ -59,7 +56,7 @@ export default function App() {
         }
         stickyHeaderOffset={50}
       />
-      <REAnimatedFlatList
+      <Animated.FlatList
         data={new Array(50).fill(0)}
         style={{
           backgroundColor: 'gray',

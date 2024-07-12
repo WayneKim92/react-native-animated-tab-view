@@ -1,8 +1,5 @@
 import { StyleSheet, View, Animated } from 'react-native';
-import {
-  RNAnimatedFlatList,
-  CollapsibleStickyHeaderOnlyRN,
-} from 'react-native-header-components';
+import { CollapsibleStickyHeaderOnlyRN } from 'react-native-header-components';
 import { useRef } from 'react';
 
 export default function AppRN() {
@@ -39,7 +36,7 @@ export default function AppRN() {
         }
         stickyHeaderOffset={50}
       />
-      <RNAnimatedFlatList
+      <Animated.FlatList
         data={new Array(50).fill(0)}
         style={{
           backgroundColor: 'gary',
