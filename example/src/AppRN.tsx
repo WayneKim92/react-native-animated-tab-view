@@ -1,9 +1,10 @@
-import { StyleSheet, View, Animated } from 'react-native';
+import { StyleSheet, View, Animated, Pressable } from 'react-native';
 import { CollapsibleStickyHeaderOnlyRN } from 'react-native-header-components';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 export default function AppRN() {
   const animationScrollY = useRef(new Animated.Value(0)).current;
+  const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
 
   const onScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: animationScrollY } } }],
@@ -14,49 +15,78 @@ export default function AppRN() {
     <View style={styles.container}>
       <CollapsibleStickyHeaderOnlyRN
         animationScrollY={animationScrollY}
+        onHeaderHeightChange={setCollapsibleHeaderHeight} // Add this line
         CollapsibleHeader={
-          <View style={styles.collapsibleHeader}>
-            <View
-              style={{
-                height: 100,
-                width: 100,
-                backgroundColor: 'black',
-                borderRadius: 50,
-              }}
-            />
-          </View>
+          <Pressable
+            onPress={() => {
+              console.log('collapsible Header');
+            }}
+          >
+            <View style={styles.collapsibleHeader}>
+              <View
+                style={{
+                  height: 100,
+                  width: 100,
+                  backgroundColor: 'black',
+                  borderRadius: 50,
+                }}
+              />
+            </View>
+          </Pressable>
         }
         StickyHeader={
-          <View
-            style={{
-              backgroundColor: 'yellow',
-              height: 60,
+          <Pressable
+            onPress={() => {
+              console.log('sticky header');
             }}
-          />
+          >
+            <View
+              style={{
+                backgroundColor: 'yellow',
+                height: 50,
+              }}
+            />
+          </Pressable>
         }
-        stickyHeaderOffset={50}
       />
       <Animated.FlatList
-        data={new Array(50).fill(0)}
-        style={{
-          backgroundColor: 'gary',
+        data={new Array(100).fill(0)}
+        stickyHeaderIndices={[0]}
+        style={{ overflow: 'visible' }}
+        contentContainerStyle={{
+          backgroundColor: 'gray',
+          paddingTop: collapsibleHeaderHeight,
         }}
-        contentContainerStyle={{ backgroundColor: 'gray' }}
         onScroll={onScroll}
         renderItem={({ index }) => {
+          if (index === 0) {
+            return (
+              <Pressable onPress={() => console.log('tool bar')}>
+                <Animated.View
+                  style={{
+                    backgroundColor: 'pink',
+                    height: 50,
+                  }}
+                />
+              </Pressable>
+            );
+          }
+
           type ColorIndex = 0 | 1 | 2;
           const colorIndex: ColorIndex = (index % 3) as ColorIndex;
 
           const colorMap = {
-            '0': 'red',
+            '0': 'black',
             '1': 'green',
             '2': 'blue',
           };
 
           return (
-            <View
-              style={{ height: 100, backgroundColor: colorMap[colorIndex] }}
-            />
+            <Pressable onPress={() => console.log(index)}>
+              <View
+                style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
+              />
+            </Pressable>
           );
         }}
       />

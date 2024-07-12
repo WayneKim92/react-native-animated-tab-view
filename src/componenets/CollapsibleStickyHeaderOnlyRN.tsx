@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Animated, type ViewStyle } from 'react-native';
 
 interface CollapsibleStickyHeaderProps {
@@ -7,6 +7,7 @@ interface CollapsibleStickyHeaderProps {
   CollapsibleHeader: React.ReactNode;
   StickyHeader?: React.ReactNode;
   stickyHeaderOffset?: number;
+  onHeaderHeightChange?: (height: number) => void; // Add this line
 }
 
 export const CollapsibleStickyHeaderOnlyRN = (
@@ -17,11 +18,18 @@ export const CollapsibleStickyHeaderOnlyRN = (
     animationScrollY,
     CollapsibleHeader,
     StickyHeader,
-    stickyHeaderOffset = 0,
+    onHeaderHeightChange,
   } = props;
 
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] =
     useState<number>(0);
+  const [stickyHeaderHeight, setStickyHeaderHeight] = useState<number>(0);
+
+  useEffect(() => {
+    if (onHeaderHeightChange) {
+      onHeaderHeightChange(collapsibleHeaderHeight + stickyHeaderHeight);
+    }
+  }, [stickyHeaderHeight, collapsibleHeaderHeight, onHeaderHeightChange]); // Add this useEffect
 
   const collapsibleHeaderHeaderTranslateY = animationScrollY.interpolate({
     inputRange: [0, collapsibleHeaderHeight],
@@ -30,12 +38,13 @@ export const CollapsibleStickyHeaderOnlyRN = (
   });
   const stickyHeaderHeaderTranslateY = animationScrollY.interpolate({
     inputRange: [0, collapsibleHeaderHeight],
-    outputRange: [0, -collapsibleHeaderHeight + stickyHeaderOffset],
+    outputRange: [0, -collapsibleHeaderHeight],
     extrapolate: 'clamp',
   });
 
   return (
     <Animated.View
+      pointerEvents={'box-none'}
       style={[
         {
           position: 'absolute',
@@ -57,6 +66,9 @@ export const CollapsibleStickyHeaderOnlyRN = (
       </Animated.View>
       <Animated.View
         style={{ transform: [{ translateY: stickyHeaderHeaderTranslateY }] }}
+        onLayout={(event) => {
+          setStickyHeaderHeight(event.nativeEvent.layout.height);
+        }}
       >
         {StickyHeader}
       </Animated.View>
