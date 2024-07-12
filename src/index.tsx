@@ -1,4 +1,7 @@
-import { Animated } from 'react-native';
+import { Animated as RNAnimated } from 'react-native';
+import REAnimated from 'react-native-reanimated';
 
-export const AnimatedFlatList = Animated.FlatList;
+export const RNAnimatedFlatList = RNAnimated.FlatList;
+export const REAnimatedFlatList = REAnimated.FlatList;
 export { CollapsibleStickyHeaderOnlyRN } from './componenets/CollapsibleStickyHeaderOnlyRN';
+export { CollapsibleStickyHeader } from './componenets/CollapsibleStickyHeader';

@@ -1,22 +1,42 @@
-import { StyleSheet, View, Animated } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import {
-  AnimatedFlatList,
-  CollapsibleStickyHeaderOnlyRN,
+  CollapsibleStickyHeader,
+  REAnimatedFlatList,
 } from 'react-native-header-components';
-import { useRef } from 'react';
+import {
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from 'react-native-reanimated';
+import { useCallback } from 'react';
 
 export default function App() {
-  const animationScrollY = useRef(new Animated.Value(0)).current;
+  const sharedScrollY = useSharedValue(0);
 
-  const onScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: animationScrollY } } }],
-    { useNativeDriver: true } // useNativeDriver을 사용하려면 Animated Component를 사용해야함
-  );
+  const scrollHandler = useAnimatedScrollHandler((event) => {
+    sharedScrollY.value = event.contentOffset.y;
+  });
+
+  const renderItem = useCallback(({ index }: { index: number }) => {
+    type ColorIndex = 0 | 1 | 2;
+    const colorIndex: ColorIndex = (index % 3) as ColorIndex;
+
+    const colorMap = {
+      '0': 'pink',
+      '1': 'purple',
+      '2': 'orange',
+    };
+
+    return (
+      <Pressable onPress={() => console.log('onPress', index)}>
+        <View style={{ height: 100, backgroundColor: colorMap[colorIndex] }} />
+      </Pressable>
+    );
+  }, []);
 
   return (
     <View style={styles.container}>
-      <CollapsibleStickyHeaderOnlyRN
-        animationScrollY={animationScrollY}
+      <CollapsibleStickyHeader
+        sharedScrollY={sharedScrollY}
         CollapsibleHeader={
           <View style={styles.collapsibleHeader}>
             <View
@@ -39,29 +59,17 @@ export default function App() {
         }
         stickyHeaderOffset={50}
       />
-      <AnimatedFlatList
+      <REAnimatedFlatList
         data={new Array(50).fill(0)}
         style={{
-          backgroundColor: 'gary',
+          backgroundColor: 'gray',
         }}
+        windowSize={10}
+        keyExtractor={(_, index) => index.toString()}
         contentContainerStyle={{ backgroundColor: 'gray' }}
-        onScroll={onScroll}
-        renderItem={({ index }) => {
-          type ColorIndex = 0 | 1 | 2;
-          const colorIndex: ColorIndex = (index % 3) as ColorIndex;
-
-          const colorMap = {
-            '0': 'red',
-            '1': 'green',
-            '2': 'blue',
-          };
-
-          return (
-            <View
-              style={{ height: 100, backgroundColor: colorMap[colorIndex] }}
-            />
-          );
-        }}
+        onScroll={scrollHandler}
+        scrollEventThrottle={16}
+        renderItem={renderItem}
       />
     </View>
   );
