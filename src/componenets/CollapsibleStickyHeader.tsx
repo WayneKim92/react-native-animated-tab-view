@@ -1,44 +1,65 @@
-import React, { useRef } from 'react';
-import { Animated, View, type ViewStyle } from 'react-native';
+import React, { useState } from 'react';
+import { Animated, type ViewStyle } from 'react-native';
 
 interface CollapsibleStickyHeaderProps {
   containerStyle?: ViewStyle;
   animationScrollY: Animated.Value;
   CollapsibleHeader: React.ReactNode;
   StickyHeader?: React.ReactNode;
+  stickyHeaderOffset?: number;
 }
 
 export const CollapsibleStickyHeader = (
   props: CollapsibleStickyHeaderProps
 ) => {
-  const { containerStyle, animationScrollY, CollapsibleHeader, StickyHeader } =
-    props;
-  const collapsibleHeaderHeightRef = useRef<number>(0);
+  const {
+    containerStyle,
+    animationScrollY,
+    CollapsibleHeader,
+    StickyHeader,
+    stickyHeaderOffset = 0,
+  } = props;
 
-  const headerTranslateY = animationScrollY.interpolate({
-    inputRange: [0, collapsibleHeaderHeightRef.current],
-    outputRange: [0, -collapsibleHeaderHeightRef.current],
+  const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] =
+    useState<number>(0);
+
+  const collapsibleHeaderHeaderTranslateY = animationScrollY.interpolate({
+    inputRange: [0, collapsibleHeaderHeight],
+    outputRange: [0, -collapsibleHeaderHeight],
+    extrapolate: 'clamp',
+  });
+  const stickyHeaderHeaderTranslateY = animationScrollY.interpolate({
+    inputRange: [0, collapsibleHeaderHeight],
+    outputRange: [0, -collapsibleHeaderHeight + stickyHeaderOffset],
     extrapolate: 'clamp',
   });
 
   return (
-    <View
+    <Animated.View
       style={[
-        { position: 'absolute', width: '100%', zIndex: 2 },
+        {
+          position: 'absolute',
+          width: '100%',
+          zIndex: 1,
+        },
         containerStyle,
       ]}
     >
       <Animated.View
         style={{
-          transform: [{ translateY: headerTranslateY }],
+          transform: [{ translateY: collapsibleHeaderHeaderTranslateY }],
         }}
         onLayout={(event) => {
-          collapsibleHeaderHeightRef.current = event.nativeEvent.layout.height;
+          setCollapsibleHeaderHeight(event.nativeEvent.layout.height);
         }}
       >
         {CollapsibleHeader}
       </Animated.View>
-      {StickyHeader}
-    </View>
+      <Animated.View
+        style={{ transform: [{ translateY: stickyHeaderHeaderTranslateY }] }}
+      >
+        {StickyHeader}
+      </Animated.View>
+    </Animated.View>
   );
 };

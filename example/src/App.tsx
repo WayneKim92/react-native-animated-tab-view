@@ -16,7 +16,6 @@ export default function App() {
   return (
     <View style={styles.container}>
       <CollapsibleStickyHeader
-        containerStyle={{}}
         animationScrollY={animationScrollY}
         CollapsibleHeader={
           <View style={styles.collapsibleHeader}>
@@ -30,6 +29,15 @@ export default function App() {
             />
           </View>
         }
+        StickyHeader={
+          <View
+            style={{
+              backgroundColor: 'yellow',
+              height: 60,
+            }}
+          />
+        }
+        stickyHeaderOffset={50}
       />
       <AnimatedFlatList
         data={new Array(50).fill(0)}
@@ -68,6 +76,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 300,
+    width: '100%',
     backgroundColor: 'white',
   },
 });
