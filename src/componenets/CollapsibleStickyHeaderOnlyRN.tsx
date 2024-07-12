@@ -9,7 +9,7 @@ interface CollapsibleStickyHeaderProps {
   stickyHeaderOffset?: number;
 }
 
-export const CollapsibleStickyHeader = (
+export const CollapsibleStickyHeaderOnlyRN = (
   props: CollapsibleStickyHeaderProps
 ) => {
   const {

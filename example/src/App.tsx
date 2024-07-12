@@ -1,7 +1,7 @@
 import { StyleSheet, View, Animated } from 'react-native';
 import {
   AnimatedFlatList,
-  CollapsibleStickyHeader,
+  CollapsibleStickyHeaderOnlyRN,
 } from 'react-native-header-components';
 import { useRef } from 'react';
 
@@ -15,7 +15,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <CollapsibleStickyHeader
+      <CollapsibleStickyHeaderOnlyRN
         animationScrollY={animationScrollY}
         CollapsibleHeader={
           <View style={styles.collapsibleHeader}>
