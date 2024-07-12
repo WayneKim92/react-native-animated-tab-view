@@ -1,3 +1,4 @@
-export function multiply(a: number, b: number): Promise<number> {
-  return Promise.resolve(a * b);
-}
+import { Animated } from 'react-native';
+
+export const AnimatedFlatList = Animated.FlatList;
+export { CollapsibleStickyHeaderOnlyRN } from './componenets/CollapsibleStickyHeaderOnlyRN';
