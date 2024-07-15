@@ -121,7 +121,7 @@ export default function AppRN() {
             </View>
           </Pressable>
         }
-        CollapsibleToolBar={
+        BottomToolBar={
           <Pressable
             onPress={() => {
               console.log('collapsible toolbar');

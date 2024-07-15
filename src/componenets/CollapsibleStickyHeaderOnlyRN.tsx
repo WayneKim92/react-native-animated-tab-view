@@ -8,7 +8,7 @@ interface CollapsibleStickyHeaderProps {
   TopToolbar?: React.ReactNode;
   StickyHeader?: React.ReactNode;
   stickyHeaderOffsetY?: number;
-  CollapsibleToolBar?: React.ReactNode;
+  BottomToolBar?: React.ReactNode;
   containerStyle?: ViewStyle;
 }
 
@@ -22,7 +22,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
     TopToolbar,
     StickyHeader,
     stickyHeaderOffsetY = 0,
-    CollapsibleToolBar,
+    BottomToolBar,
     onHeaderHeightChange,
   } = props;
 
@@ -162,7 +162,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
             setToolBarHeight(event.nativeEvent.layout.height);
           }}
         >
-          {CollapsibleToolBar}
+          {BottomToolBar}
         </Animated.View>
       </Animated.View>
     </Animated.View>
