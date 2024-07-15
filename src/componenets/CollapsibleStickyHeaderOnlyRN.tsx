@@ -40,12 +40,14 @@ export const CollapsibleStickyHeaderOnlyRN = (
 
       // Sticky Header 처리 로직
       stickyHeaderHeaderTranslateY.setValue(
-        currentScrollY <= collapsibleHeaderHeight - stickyHeaderOffsetY
-          ? -currentScrollY
-          : -Math.min(
-              currentScrollY,
-              collapsibleHeaderHeight - stickyHeaderOffsetY
-            )
+        currentScrollY <= 0
+          ? 0
+          : currentScrollY <= collapsibleHeaderHeight - stickyHeaderOffsetY
+            ? -currentScrollY
+            : -Math.min(
+                currentScrollY,
+                collapsibleHeaderHeight - stickyHeaderOffsetY
+              )
       );
 
       // Collapsible Toolbar 처리 로직
