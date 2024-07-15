@@ -115,6 +115,16 @@ export const CollapsibleStickyHeaderOnlyRN = (
         containerStyle,
       ]}
     >
+      {/* Sticky Header에 offset이 적용되었을 때, Header 뒤에 있는 요소 안 보이게 처리 */}
+      <View
+        style={{
+          position: 'absolute',
+          height: stickyHeaderOffsetY,
+          width: '100%',
+          backgroundColor: 'green',
+        }}
+      />
+      {/* Collapsible Header */}
       <Animated.View
         style={{
           transform: [{ translateY: collapsibleHeaderHeaderTranslateY }],
@@ -125,6 +135,8 @@ export const CollapsibleStickyHeaderOnlyRN = (
       >
         {CollapsibleHeader}
       </Animated.View>
+
+      {/* Sticky Header and Collapsible Sticky Toolbar*/}
       <Animated.View
         pointerEvents={'box-none'}
         style={{
