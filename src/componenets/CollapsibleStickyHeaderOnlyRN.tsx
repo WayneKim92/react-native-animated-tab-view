@@ -5,6 +5,7 @@ interface CollapsibleStickyHeaderProps {
   animationScrollY: Animated.Value;
   onHeaderHeightChange: (height: number) => void;
   CollapsibleHeader: React.ReactNode;
+  TopToolbar?: React.ReactNode;
   StickyHeader?: React.ReactNode;
   stickyHeaderOffsetY?: number;
   CollapsibleToolBar?: React.ReactNode;
@@ -18,6 +19,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
     containerStyle,
     animationScrollY,
     CollapsibleHeader,
+    TopToolbar,
     StickyHeader,
     stickyHeaderOffsetY = 0,
     CollapsibleToolBar,
@@ -93,7 +95,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
 
   useEffect(() => {
     if (onHeaderHeightChange) {
-      onHeaderHeightChange(collapsibleHeaderHeight + stickyHeaderHeight);
+      onHeaderHeightChange(collapsibleHeaderHeight);
     }
   }, [stickyHeaderHeight, collapsibleHeaderHeight, onHeaderHeightChange]); // Add this useEffect
 
@@ -124,6 +126,9 @@ export const CollapsibleStickyHeaderOnlyRN = (
           backgroundColor: 'green',
         }}
       />
+      {/* Top Header */}
+      {TopToolbar}
+
       {/* Collapsible Header */}
       <Animated.View
         style={{

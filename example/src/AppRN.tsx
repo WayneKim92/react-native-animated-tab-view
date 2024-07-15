@@ -6,6 +6,26 @@ export default function AppRN() {
   const animationScrollY = useRef(new Animated.Value(0)).current;
   // collapsibleHeaderHeight을 이용하여 FlatList의 paddingTop을 설정합니다!
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
+  const stickyHeaderOffsetY = 120;
+
+  const animationBackgroundColor =
+    collapsibleHeaderHeight > 0
+      ? animationScrollY.interpolate({
+          inputRange: [
+            -collapsibleHeaderHeight,
+            0,
+            stickyHeaderOffsetY,
+            collapsibleHeaderHeight,
+          ],
+          outputRange: [
+            'rgba(255, 255, 255, 1)',
+            'rgba(255, 255, 255, 1)',
+            'rgba(255, 255, 255, 1)',
+            'rgba(0, 0, 0, 1)',
+          ], // Change these colors to your desired initial and final colors
+          extrapolate: 'clamp',
+        })
+      : 'rgba(255, 255, 255, 1)';
 
   const onScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: animationScrollY } } }],
@@ -24,6 +44,45 @@ export default function AppRN() {
       <CollapsibleStickyHeaderOnlyRN
         animationScrollY={animationScrollY}
         onHeaderHeightChange={setCollapsibleHeaderHeight} // Add this line
+        TopToolbar={
+          <Animated.View
+            style={{
+              height: stickyHeaderOffsetY,
+              backgroundColor: animationBackgroundColor,
+              position: 'absolute',
+              width: '100%',
+              zIndex: 3,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <View
+              style={{
+                flex: 1,
+                alignSelf: 'stretch',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                paddingHorizontal: 16,
+                paddingTop: 60,
+              }}
+            >
+              <Pressable onPress={() => console.log('Left')}>
+                <Text style={{ backgroundColor: 'green', padding: 8 }}>
+                  Left
+                </Text>
+              </Pressable>
+              <Text style={{ backgroundColor: 'green', padding: 8 }}>
+                Top Header
+              </Text>
+              <Pressable onPress={() => console.log('Right')}>
+                <Text style={{ backgroundColor: 'green', padding: 8 }}>
+                  Right
+                </Text>
+              </Pressable>
+            </View>
+          </Animated.View>
+        }
         CollapsibleHeader={
           <Pressable
             onPress={() => {
@@ -43,7 +102,7 @@ export default function AppRN() {
             </View>
           </Pressable>
         }
-        stickyHeaderOffsetY={60}
+        stickyHeaderOffsetY={stickyHeaderOffsetY}
         StickyHeader={
           <Pressable
             onPress={() => {
