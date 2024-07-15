@@ -59,41 +59,28 @@ export default function AppRN() {
         TopToolbar={
           <Animated.View
             style={{
-              // TODO: height를 이용하면 레이아웃 문제 발생할 수 있어보임, 수정하자
-              height: stickyHeaderOffsetY,
+              alignSelf: 'stretch',
               backgroundColor: animationBackgroundColor,
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingHorizontal: 16,
               position: 'absolute',
               width: '100%',
               zIndex: 3,
-              alignItems: 'center',
-              justifyContent: 'center',
             }}
           >
-            <View
-              style={{
-                flex: 1,
-                alignSelf: 'stretch',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingHorizontal: 16,
-                paddingTop: 60,
-              }}
-            >
-              <Pressable onPress={() => console.log('Left')}>
-                <Text style={{ backgroundColor: 'green', padding: 8 }}>
-                  Left
-                </Text>
-              </Pressable>
+            <Pressable onPress={() => console.log('Left')}>
+              <Text style={{ backgroundColor: 'green', padding: 8 }}>Left</Text>
+            </Pressable>
+            <Text style={{ backgroundColor: 'green', padding: 8 }}>
+              Top Header
+            </Text>
+            <Pressable onPress={() => console.log('Right')}>
               <Text style={{ backgroundColor: 'green', padding: 8 }}>
-                Top Header
+                Right
               </Text>
-              <Pressable onPress={() => console.log('Right')}>
-                <Text style={{ backgroundColor: 'green', padding: 8 }}>
-                  Right
-                </Text>
-              </Pressable>
-            </View>
+            </Pressable>
           </Animated.View>
         }
         CollapsibleHeader={
@@ -183,6 +170,7 @@ export default function AppRN() {
         }
       />
       <PagerView
+        ref={viewPagerRef}
         useNext={true}
         style={{ flex: 1 }}
         onPageScroll={(e) => {
@@ -192,7 +180,6 @@ export default function AppRN() {
       >
         <Animated.FlatList
           data={new Array(100).fill(0)}
-          style={{ overflow: 'visible' }}
           contentContainerStyle={{
             backgroundColor: 'gray',
             paddingTop: collapsibleHeaderHeight,
@@ -220,7 +207,6 @@ export default function AppRN() {
         <Animated.FlatList
           initialScrollIndex={0}
           data={new Array(100).fill(0)}
-          style={{ overflow: 'visible' }}
           contentContainerStyle={{
             backgroundColor: 'gray',
             paddingTop: collapsibleHeaderHeight,
@@ -248,7 +234,6 @@ export default function AppRN() {
         <Animated.FlatList
           initialScrollIndex={0}
           data={new Array(100).fill(0)}
-          style={{ overflow: 'visible' }}
           contentContainerStyle={{
             backgroundColor: 'gray',
             paddingTop: collapsibleHeaderHeight,
