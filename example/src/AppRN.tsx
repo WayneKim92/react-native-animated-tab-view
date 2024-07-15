@@ -118,7 +118,7 @@ export default function AppRN() {
                     backgroundColor: 'gray',
                   }}
                 >
-                  <Text>Tool Bar {index}</Text>
+                  <Text>Tab {index}</Text>
                 </View>
               </Pressable>
             ))}
