@@ -1,4 +1,11 @@
-import { View, Animated, Pressable, Text, Dimensions } from 'react-native';
+import {
+  View,
+  Animated,
+  Pressable,
+  Text,
+  Dimensions,
+  Platform,
+} from 'react-native';
 import { CollapsibleStickyHeaderOnlyRN } from 'react-native-header-components';
 import { useRef, useState } from 'react';
 import PagerView from 'react-native-pager-view';
@@ -8,7 +15,7 @@ export default function AppRN() {
   const animationPagerViewScrollX = useRef(new Animated.Value(0)).current;
   // collapsibleHeaderHeight을 이용하여 FlatList의 paddingTop을 설정합니다!
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
-  const stickyHeaderOffsetY = 120;
+  const stickyHeaderOffsetY = Platform.OS === 'ios' ? 120 : 100;
 
   const animationBackgroundColor =
     collapsibleHeaderHeight > 0
@@ -52,6 +59,7 @@ export default function AppRN() {
         TopToolbar={
           <Animated.View
             style={{
+              // TODO: height를 이용하면 레이아웃 문제 발생할 수 있어보임, 수정하자
               height: stickyHeaderOffsetY,
               backgroundColor: animationBackgroundColor,
               position: 'absolute',
