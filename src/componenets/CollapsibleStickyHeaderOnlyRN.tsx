@@ -47,9 +47,9 @@ export const CollapsibleStickyHeaderOnlyRN = forwardRef(
     const [lastScrollY, setLastScrollY] = useState(0);
 
     useImperativeHandle(ref, () => ({
-      expand: () => {
+      expand: (lastValue: number) => {
         Animated.timing(animationScrollY, {
-          toValue: 0, // Assuming 0 is the expanded state
+          toValue: lastValue, // Assuming 0 is the expanded state
           duration: 200,
           useNativeDriver: true,
         }).start();

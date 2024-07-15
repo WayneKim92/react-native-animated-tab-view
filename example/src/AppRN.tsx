@@ -126,11 +126,13 @@ export default function AppRN() {
                     // @ts-ignore
                     flatListScrollYsRef.current[index] < collapsibleHeaderHeight
                   ) {
-                    console.log('펼치자');
-                    collapsibleStickyHeaderOnlyRNRef.current?.expand();
+                    collapsibleStickyHeaderOnlyRNRef.current?.expand(
+                      flatListScrollYsRef.current[index]
+                    );
                   } else {
-                    console.log('접자');
-                    collapsibleStickyHeaderOnlyRNRef.current?.collapse();
+                    collapsibleStickyHeaderOnlyRNRef.current?.collapse(
+                      flatListScrollYsRef.current[index]
+                    );
                   }
                 }}
               >
@@ -199,6 +201,19 @@ export default function AppRN() {
         onPageScroll={(e) => {
           const { position, offset } = e.nativeEvent;
           animationPagerViewScrollX.setValue(position + offset);
+
+          if (
+            // @ts-ignore
+            flatListScrollYsRef.current[position] < collapsibleHeaderHeight
+          ) {
+            collapsibleStickyHeaderOnlyRNRef.current?.expand(
+              flatListScrollYsRef.current[position]
+            );
+          } else {
+            collapsibleStickyHeaderOnlyRNRef.current?.collapse(
+              flatListScrollYsRef.current[position]
+            );
+          }
         }}
       >
         <Animated.FlatList
