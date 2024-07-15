@@ -1,4 +1,12 @@
-import { View, Animated, Pressable, Text, Dimensions } from 'react-native';
+import {
+  View,
+  Animated,
+  Pressable,
+  Text,
+  Dimensions,
+  type NativeSyntheticEvent,
+  type NativeScrollEvent,
+} from 'react-native';
 import { CollapsibleStickyHeaderOnlyRN } from 'react-native-header-components';
 import { useRef, useState } from 'react';
 import PagerView from 'react-native-pager-view';
@@ -41,17 +49,13 @@ export default function AppRN() {
   //       })
   //     : 'rgba(255, 255, 255, 1)';
 
-  const onListScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: animationListScrollY } } }],
-    {
-      listener: (event: any) => {
-        const { y } = event.nativeEvent.contentOffset;
-        // @ts-ignore, 성능 이슈로 인하여 Ref 이용
-        flatListScrollYsRef.current[tabIndex] = y;
-      },
-      useNativeDriver: true,
-    }
-  );
+  // Animated.event 내에서 갱신 된 값 참조 불가하여, 일반 함수로 변경
+  const onListScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { y } = event.nativeEvent.contentOffset;
+    // @ts-ignore
+    flatListScrollYsRef.current[tabIndex] = y;
+    animationListScrollY.setValue(y);
+  };
 
   // @ts-ignore
   return (
@@ -201,6 +205,7 @@ export default function AppRN() {
         onPageScroll={(e) => {
           const { position, offset } = e.nativeEvent;
           animationPagerViewScrollX.setValue(position + offset);
+          setTabIndex(position);
 
           if (
             // @ts-ignore
