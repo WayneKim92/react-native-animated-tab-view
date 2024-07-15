@@ -5,8 +5,11 @@ interface CollapsibleStickyHeaderProps {
   animationScrollY: Animated.Value;
   onHeaderHeightChange: (height: number) => void;
   CollapsibleHeader: React.ReactNode;
+  TopToolbar?: React.ReactNode;
   StickyHeader?: React.ReactNode;
-  CollapsibleToolBar?: React.ReactNode;
+  stickyHeaderOffsetY?: number;
+  BottomToolBar?: React.ReactNode;
+  collapsibleBottomToolBar?: boolean;
   containerStyle?: ViewStyle;
 }
 
@@ -17,45 +20,74 @@ export const CollapsibleStickyHeaderOnlyRN = (
     containerStyle,
     animationScrollY,
     CollapsibleHeader,
+    TopToolbar,
     StickyHeader,
-    CollapsibleToolBar,
+    stickyHeaderOffsetY = 0,
+    BottomToolBar,
+    collapsibleBottomToolBar = true,
     onHeaderHeightChange,
   } = props;
 
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] =
     useState<number>(0);
   const [stickyHeaderHeight, setStickyHeaderHeight] = useState<number>(0);
+  const stickyHeaderHeaderTranslateY = useRef(new Animated.Value(0)).current;
 
   const [toolBarHeight, setToolBarHeight] = useState(0);
   const toolbarTranslateY = useRef(new Animated.Value(0)).current;
-  const [shouldToolBarDown, setShouldToolBarDown] = useState(true);
+  const [visibleCollapsibleBottomToolBar, setVisibleCollapsibleBottomToolBar] =
+    useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+
+  const collapsibleHeaderHeaderTranslateY = animationScrollY.interpolate({
+    inputRange: [0, collapsibleHeaderHeight],
+    outputRange: [0, -collapsibleHeaderHeight],
+    extrapolate: 'clamp',
+  });
 
   useEffect(() => {
     const id = animationScrollY.addListener((state) => {
       const currentScrollY = state.value;
+
+      // Sticky Header 처리 로직
+      stickyHeaderHeaderTranslateY.setValue(
+        currentScrollY <= 0
+          ? 0
+          : currentScrollY <= collapsibleHeaderHeight - stickyHeaderOffsetY
+            ? -currentScrollY
+            : -Math.min(
+                currentScrollY,
+                collapsibleHeaderHeight - stickyHeaderOffsetY
+              )
+      );
+
+      // Collapsible Toolbar 처리 로직
       const deltaY = currentScrollY - lastScrollY;
       setLastScrollY(currentScrollY);
-
       let direction = null;
       if (deltaY < 0) {
         direction = 'up';
       } else if (deltaY > 0) {
         direction = 'down';
       }
-
       if (direction !== null && currentScrollY > collapsibleHeaderHeight) {
-        setShouldToolBarDown(direction === 'up');
+        setVisibleCollapsibleBottomToolBar(direction === 'up');
       }
     });
 
     return () => {
       animationScrollY.removeListener(id);
     };
-  }, [animationScrollY, collapsibleHeaderHeight, lastScrollY]);
+  }, [
+    animationScrollY,
+    collapsibleHeaderHeight,
+    lastScrollY,
+    stickyHeaderHeaderTranslateY,
+    stickyHeaderOffsetY,
+  ]);
 
   useEffect(() => {
-    if (shouldToolBarDown) {
+    if (visibleCollapsibleBottomToolBar) {
       Animated.timing(toolbarTranslateY, {
         toValue: 0,
         duration: 300,
@@ -68,24 +100,13 @@ export const CollapsibleStickyHeaderOnlyRN = (
         useNativeDriver: true,
       }).start();
     }
-  }, [shouldToolBarDown, toolBarHeight, toolbarTranslateY]);
+  }, [visibleCollapsibleBottomToolBar, toolBarHeight, toolbarTranslateY]);
 
   useEffect(() => {
     if (onHeaderHeightChange) {
       onHeaderHeightChange(collapsibleHeaderHeight + stickyHeaderHeight);
     }
   }, [stickyHeaderHeight, collapsibleHeaderHeight, onHeaderHeightChange]); // Add this useEffect
-
-  const collapsibleHeaderHeaderTranslateY = animationScrollY.interpolate({
-    inputRange: [0, collapsibleHeaderHeight],
-    outputRange: [0, -collapsibleHeaderHeight],
-    extrapolate: 'clamp',
-  });
-  const stickyHeaderHeaderTranslateY = animationScrollY.interpolate({
-    inputRange: [0, collapsibleHeaderHeight],
-    outputRange: [0, -collapsibleHeaderHeight],
-    extrapolate: 'clamp',
-  });
 
   return (
     <Animated.View
@@ -99,6 +120,19 @@ export const CollapsibleStickyHeaderOnlyRN = (
         containerStyle,
       ]}
     >
+      {/* Sticky Header에 offset이 적용되었을 때, Header 뒤에 있는 요소 안 보이게 처리 */}
+      <View
+        style={{
+          position: 'absolute',
+          height: stickyHeaderOffsetY,
+          width: '100%',
+          backgroundColor: 'red',
+        }}
+      />
+      {/* Top Header */}
+      {TopToolbar}
+
+      {/* Collapsible Header */}
       <Animated.View
         style={{
           transform: [{ translateY: collapsibleHeaderHeaderTranslateY }],
@@ -109,7 +143,10 @@ export const CollapsibleStickyHeaderOnlyRN = (
       >
         {CollapsibleHeader}
       </Animated.View>
+
+      {/* Sticky Header and Collapsible Sticky Toolbar*/}
       <Animated.View
+        pointerEvents={'box-none'}
         style={{
           zIndex: 2,
           transform: [{ translateY: stickyHeaderHeaderTranslateY }],
@@ -122,13 +159,17 @@ export const CollapsibleStickyHeaderOnlyRN = (
         <Animated.View
           style={[
             { zIndex: 1 },
-            { transform: [{ translateY: toolbarTranslateY }] },
+            {
+              transform: collapsibleBottomToolBar
+                ? [{ translateY: toolbarTranslateY }]
+                : undefined,
+            },
           ]}
           onLayout={(event) => {
             setToolBarHeight(event.nativeEvent.layout.height);
           }}
         >
-          {CollapsibleToolBar}
+          {BottomToolBar}
         </Animated.View>
       </Animated.View>
     </Animated.View>
