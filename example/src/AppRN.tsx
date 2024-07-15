@@ -16,11 +16,14 @@ export default function AppRN() {
             0,
             stickyHeaderOffsetY,
             collapsibleHeaderHeight,
+            // AOS 에뮬레이터에서 색상 애니메이션 적용 버그 있어서 임의로 추가
+            collapsibleHeaderHeight,
           ],
           outputRange: [
             'rgba(255, 255, 255, 1)',
             'rgba(255, 255, 255, 1)',
             'rgba(255, 255, 255, 1)',
+            'rgba(0, 0, 0, 1)',
             'rgba(0, 0, 0, 1)',
           ], // Change these colors to your desired initial and final colors
           extrapolate: 'clamp',
