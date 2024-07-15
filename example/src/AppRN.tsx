@@ -157,7 +157,7 @@ export default function AppRN() {
         BottomToolBar={
           <Pressable
             onPress={() => {
-              console.log('collapsible toolbar');
+              console.log('Bottom Toolbar');
             }}
           >
             <View
@@ -169,7 +169,7 @@ export default function AppRN() {
                 justifyContent: 'center',
               }}
             >
-              <Text>Collapsible Toolbar</Text>
+              <Text>Bottom Toolbar</Text>
             </View>
           </Pressable>
         }
