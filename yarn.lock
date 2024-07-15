@@ -12529,6 +12529,7 @@ __metadata:
     react: 18.2.0
     react-dom: 18.2.0
     react-native: 0.74.3
+    react-native-pager-view: 6.3.1
     react-native-reanimated: 3.8.1
     react-native-web: ~0.19.10
   languageName: unknown
@@ -12563,6 +12564,16 @@ __metadata:
     react-native-reanimated: "*"
   languageName: unknown
   linkType: soft
+
+"react-native-pager-view@npm:6.3.1":
+  version: 6.3.1
+  resolution: "react-native-pager-view@npm:6.3.1"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: ef83fb53350d7b4c262a8c4d4bf6fbee8f8941e56469135463a47d496ff8fd43f7efe52d02c3a583427800fc88c96a9bf8e601a45a6e671834d5fffe9541e3e4
+  languageName: node
+  linkType: hard
 
 "react-native-reanimated@npm:3.8.1":
   version: 3.8.1
