@@ -1,4 +1,4 @@
-import { StyleSheet, View, Animated, Pressable } from 'react-native';
+import { View, Animated, Pressable, Text } from 'react-native';
 import { CollapsibleStickyHeaderOnlyRN } from 'react-native-header-components';
 import { useRef, useState } from 'react';
 
@@ -15,7 +15,12 @@ export default function AppRN() {
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: 'gray',
+      }}
+    >
       <CollapsibleStickyHeaderOnlyRN
         animationScrollY={animationScrollY}
         onHeaderHeightChange={setCollapsibleHeaderHeight} // Add this line
@@ -25,15 +30,16 @@ export default function AppRN() {
               console.log('collapsible Header');
             }}
           >
-            <View style={styles.collapsibleHeader}>
-              <View
-                style={{
-                  height: 100,
-                  width: 100,
-                  backgroundColor: 'black',
-                  borderRadius: 50,
-                }}
-              />
+            <View
+              style={{
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: 300,
+                width: '100%',
+                backgroundColor: 'white',
+              }}
+            >
+              <Text>Collapsible Header</Text>
             </View>
           </Pressable>
         }
@@ -47,8 +53,12 @@ export default function AppRN() {
               style={{
                 backgroundColor: 'yellow',
                 height: 50,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-            />
+            >
+              <Text>Sticky Header</Text>
+            </View>
           </Pressable>
         }
         CollapsibleToolBar={
@@ -62,8 +72,12 @@ export default function AppRN() {
                 zIndex: 1,
                 backgroundColor: 'pink',
                 height: 50,
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-            />
+            >
+              <Text>Collapsible Toolbar</Text>
+            </View>
           </Pressable>
         }
       />
@@ -97,17 +111,3 @@ export default function AppRN() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'gray',
-  },
-  collapsibleHeader: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 300,
-    width: '100%',
-    backgroundColor: 'white',
-  },
-});
