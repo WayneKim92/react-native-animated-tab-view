@@ -36,6 +36,12 @@ export const CollapsibleStickyHeaderOnlyRN = (
   const [shouldToolBarDown, setShouldToolBarDown] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
+  const collapsibleHeaderHeaderTranslateY = animationScrollY.interpolate({
+    inputRange: [0, collapsibleHeaderHeight],
+    outputRange: [0, -collapsibleHeaderHeight],
+    extrapolate: 'clamp',
+  });
+
   useEffect(() => {
     const id = animationScrollY.addListener((state) => {
       const currentScrollY = state.value;
@@ -98,12 +104,6 @@ export const CollapsibleStickyHeaderOnlyRN = (
       onHeaderHeightChange(collapsibleHeaderHeight);
     }
   }, [stickyHeaderHeight, collapsibleHeaderHeight, onHeaderHeightChange]); // Add this useEffect
-
-  const collapsibleHeaderHeaderTranslateY = animationScrollY.interpolate({
-    inputRange: [0, collapsibleHeaderHeight],
-    outputRange: [0, -collapsibleHeaderHeight],
-    extrapolate: 'clamp',
-  });
 
   return (
     <Animated.View
