@@ -26,6 +26,7 @@ export default function AppRN() {
     1: 0,
     2: 0,
   });
+  const isScrollingRef = useRef(false);
 
   // const animationBackgroundColor =
   //   collapsibleHeaderHeight > 0
@@ -55,6 +56,9 @@ export default function AppRN() {
     // @ts-ignore
     flatListScrollYsRef.current[tabIndexRef.current] = y;
     animationListScrollY.setValue(y);
+    isScrollingRef.current = true;
+
+    console.log(flatListScrollYsRef.current);
   };
 
   // @ts-ignore
@@ -122,6 +126,12 @@ export default function AppRN() {
               <Pressable
                 key={index}
                 onPress={() => {
+                  console.log('탭 누름', flatListScrollYsRef.current);
+                  if (isScrollingRef.current) {
+                    console.log('스크롤 중이라 선택 불가');
+                    return;
+                  }
+
                   tabIndexRef.current = index;
                   pagerViewRef.current?.setPage(index);
 
@@ -203,6 +213,7 @@ export default function AppRN() {
         style={{ flex: 1 }}
         onPageSelected={(event) => {
           const { position } = event.nativeEvent;
+          tabIndexRef.current = position;
 
           if (
             // @ts-ignore
@@ -229,6 +240,9 @@ export default function AppRN() {
             paddingTop: collapsibleHeaderHeight,
           }}
           onScroll={onListScroll}
+          onMomentumScrollEnd={() => {
+            isScrollingRef.current = false;
+          }}
           renderItem={({ index }) => {
             type ColorIndex = 0 | 1 | 2;
             const colorIndex: ColorIndex = (index % 3) as ColorIndex;
@@ -256,6 +270,9 @@ export default function AppRN() {
             paddingTop: collapsibleHeaderHeight,
           }}
           onScroll={onListScroll}
+          onMomentumScrollEnd={() => {
+            isScrollingRef.current = false;
+          }}
           renderItem={({ index }) => {
             type ColorIndex = 0 | 1 | 2;
             const colorIndex: ColorIndex = (index % 3) as ColorIndex;
@@ -283,6 +300,9 @@ export default function AppRN() {
             paddingTop: collapsibleHeaderHeight,
           }}
           onScroll={onListScroll}
+          onMomentumScrollEnd={() => {
+            isScrollingRef.current = false;
+          }}
           renderItem={({ index }) => {
             type ColorIndex = 0 | 1 | 2;
             const colorIndex: ColorIndex = (index % 3) as ColorIndex;
