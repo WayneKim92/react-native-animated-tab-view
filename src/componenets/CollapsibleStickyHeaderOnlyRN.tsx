@@ -6,6 +6,7 @@ interface CollapsibleStickyHeaderProps {
   onHeaderHeightChange: (height: number) => void;
   CollapsibleHeader: React.ReactNode;
   StickyHeader?: React.ReactNode;
+  stickyHeaderOffsetY?: number;
   CollapsibleToolBar?: React.ReactNode;
   containerStyle?: ViewStyle;
 }
@@ -18,6 +19,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
     animationScrollY,
     CollapsibleHeader,
     StickyHeader,
+    stickyHeaderOffsetY = 0,
     CollapsibleToolBar,
     onHeaderHeightChange,
   } = props;
@@ -25,6 +27,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] =
     useState<number>(0);
   const [stickyHeaderHeight, setStickyHeaderHeight] = useState<number>(0);
+  const stickyHeaderHeaderTranslateY = useRef(new Animated.Value(0)).current;
 
   const [toolBarHeight, setToolBarHeight] = useState(0);
   const toolbarTranslateY = useRef(new Animated.Value(0)).current;
@@ -34,6 +37,16 @@ export const CollapsibleStickyHeaderOnlyRN = (
   useEffect(() => {
     const id = animationScrollY.addListener((state) => {
       const currentScrollY = state.value;
+
+      // Sticky Header 처리 로직
+      stickyHeaderHeaderTranslateY.setValue(
+        currentScrollY <= collapsibleHeaderHeight - stickyHeaderOffsetY
+          ? -currentScrollY
+          : -Math.min(
+              currentScrollY,
+              collapsibleHeaderHeight - stickyHeaderOffsetY
+            )
+      );
 
       // Collapsible Toolbar 처리 로직
       const deltaY = currentScrollY - lastScrollY;
@@ -52,7 +65,13 @@ export const CollapsibleStickyHeaderOnlyRN = (
     return () => {
       animationScrollY.removeListener(id);
     };
-  }, [animationScrollY, collapsibleHeaderHeight, lastScrollY]);
+  }, [
+    animationScrollY,
+    collapsibleHeaderHeight,
+    lastScrollY,
+    stickyHeaderHeaderTranslateY,
+    stickyHeaderOffsetY,
+  ]);
 
   useEffect(() => {
     if (shouldToolBarDown) {
@@ -77,11 +96,6 @@ export const CollapsibleStickyHeaderOnlyRN = (
   }, [stickyHeaderHeight, collapsibleHeaderHeight, onHeaderHeightChange]); // Add this useEffect
 
   const collapsibleHeaderHeaderTranslateY = animationScrollY.interpolate({
-    inputRange: [0, collapsibleHeaderHeight],
-    outputRange: [0, -collapsibleHeaderHeight],
-    extrapolate: 'clamp',
-  });
-  const stickyHeaderHeaderTranslateY = animationScrollY.interpolate({
     inputRange: [0, collapsibleHeaderHeight],
     outputRange: [0, -collapsibleHeaderHeight],
     extrapolate: 'clamp',

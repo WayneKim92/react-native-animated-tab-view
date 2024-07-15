@@ -43,6 +43,7 @@ export default function AppRN() {
             </View>
           </Pressable>
         }
+        stickyHeaderOffsetY={60}
         StickyHeader={
           <Pressable
             onPress={() => {
