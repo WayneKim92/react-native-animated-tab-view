@@ -20,7 +20,7 @@ export default function AppRN() {
   // const stickyHeaderOffsetY = Platform.OS === 'ios' ? 120 : 100;
   // viewPager, TODO: 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
-  const [tabIndex, setTabIndex] = useState<number>(0);
+  const tabIndexRef = useRef<number>(0);
   const flatListScrollYsRef = useRef({
     0: 0,
     1: 0,
@@ -53,7 +53,7 @@ export default function AppRN() {
   const onListScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { y } = event.nativeEvent.contentOffset;
     // @ts-ignore
-    flatListScrollYsRef.current[tabIndex] = y;
+    flatListScrollYsRef.current[tabIndexRef.current] = y;
     animationListScrollY.setValue(y);
   };
 
@@ -122,9 +122,8 @@ export default function AppRN() {
               <Pressable
                 key={index}
                 onPress={() => {
-                  console.log('Tab', index);
+                  tabIndexRef.current = index;
                   pagerViewRef.current?.setPage(index);
-                  setTabIndex(index);
 
                   if (
                     // @ts-ignore
@@ -202,10 +201,8 @@ export default function AppRN() {
         ref={pagerViewRef}
         useNext={false}
         style={{ flex: 1 }}
-        onPageScroll={(e) => {
-          const { position, offset } = e.nativeEvent;
-          animationPagerViewScrollX.setValue(position + offset);
-          setTabIndex(position);
+        onPageSelected={(event) => {
+          const { position } = event.nativeEvent;
 
           if (
             // @ts-ignore
@@ -219,6 +216,10 @@ export default function AppRN() {
               flatListScrollYsRef.current[position]
             );
           }
+        }}
+        onPageScroll={(e) => {
+          const { position, offset } = e.nativeEvent;
+          animationPagerViewScrollX.setValue(position + offset);
         }}
       >
         <Animated.FlatList
