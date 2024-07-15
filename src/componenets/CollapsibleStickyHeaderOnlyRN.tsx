@@ -126,6 +126,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
         {CollapsibleHeader}
       </Animated.View>
       <Animated.View
+        pointerEvents={'box-none'}
         style={{
           zIndex: 2,
           transform: [{ translateY: stickyHeaderHeaderTranslateY }],
