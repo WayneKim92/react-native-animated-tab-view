@@ -16,6 +16,8 @@ export default function AppRN() {
   // collapsibleHeaderHeight을 이용하여 FlatList의 paddingTop을 설정합니다!
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
   const stickyHeaderOffsetY = Platform.OS === 'ios' ? 120 : 100;
+  // viewPager, TODO: 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의
+  const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
 
   const animationBackgroundColor =
     collapsibleHeaderHeight > 0
@@ -46,6 +48,7 @@ export default function AppRN() {
     }
   );
 
+  // @ts-ignore
   return (
     <View
       style={{
@@ -110,6 +113,7 @@ export default function AppRN() {
                 key={index}
                 onPress={() => {
                   console.log('Tab', index);
+                  pagerViewRef.current?.setPage(index);
                 }}
               >
                 <View
@@ -170,8 +174,9 @@ export default function AppRN() {
         }
       />
       <PagerView
-        ref={viewPagerRef}
-        useNext={true}
+        // @ts-ignore, 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의한 ref 타입 사용
+        ref={pagerViewRef}
+        useNext={false}
         style={{ flex: 1 }}
         onPageScroll={(e) => {
           const { position, offset } = e.nativeEvent;
