@@ -1,16 +1,18 @@
-import { View, Animated, Pressable, Text } from 'react-native';
+import { View, Animated, Pressable, Text, Dimensions } from 'react-native';
 import { CollapsibleStickyHeaderOnlyRN } from 'react-native-header-components';
 import { useRef, useState } from 'react';
+import PagerView from 'react-native-pager-view';
 
 export default function AppRN() {
-  const animationScrollY = useRef(new Animated.Value(0)).current;
+  const animationListScrollY = useRef(new Animated.Value(0)).current;
+  const animationPagerViewScrollX = useRef(new Animated.Value(0)).current;
   // collapsibleHeaderHeight을 이용하여 FlatList의 paddingTop을 설정합니다!
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
   const stickyHeaderOffsetY = 120;
 
   const animationBackgroundColor =
     collapsibleHeaderHeight > 0
-      ? animationScrollY.interpolate({
+      ? animationListScrollY.interpolate({
           inputRange: [
             -collapsibleHeaderHeight,
             0,
@@ -30,8 +32,8 @@ export default function AppRN() {
         })
       : 'rgba(255, 255, 255, 1)';
 
-  const onScroll = Animated.event(
-    [{ nativeEvent: { contentOffset: { y: animationScrollY } } }],
+  const onListScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: animationListScrollY } } }],
     {
       useNativeDriver: true,
     }
@@ -45,7 +47,7 @@ export default function AppRN() {
       }}
     >
       <CollapsibleStickyHeaderOnlyRN
-        animationScrollY={animationScrollY}
+        animationScrollY={animationListScrollY}
         onHeaderHeightChange={setCollapsibleHeaderHeight} // Add this line
         TopToolbar={
           <Animated.View
@@ -107,22 +109,50 @@ export default function AppRN() {
         }
         stickyHeaderOffsetY={stickyHeaderOffsetY}
         StickyHeader={
-          <Pressable
-            onPress={() => {
-              console.log('sticky header');
-            }}
-          >
-            <View
+          <View style={{ flexDirection: 'row' }}>
+            {new Array(3).fill(0).map((_, index) => (
+              <Pressable
+                key={index}
+                onPress={() => {
+                  console.log('Tab', index);
+                }}
+              >
+                <View
+                  style={{
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: Dimensions.get('window').width / 3,
+                    height: 60,
+                    backgroundColor: 'gray',
+                  }}
+                >
+                  <Text>Tool Bar {index}</Text>
+                </View>
+              </Pressable>
+            ))}
+            <Animated.View
               style={{
-                backgroundColor: 'yellow',
-                height: 50,
-                alignItems: 'center',
-                justifyContent: 'center',
+                width: Dimensions.get('window').width / 3,
+                height: 5,
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                position: 'absolute',
+                left: 0,
+                bottom: 0,
+                transform: [
+                  {
+                    translateX: animationPagerViewScrollX.interpolate({
+                      inputRange: [0, 1, 2],
+                      outputRange: [
+                        0,
+                        Dimensions.get('window').width / 3,
+                        (Dimensions.get('window').width / 3) * 2,
+                      ],
+                    }),
+                  },
+                ],
               }}
-            >
-              <Text>Sticky Header</Text>
-            </View>
-          </Pressable>
+            />
+          </View>
         }
         BottomToolBar={
           <Pressable
@@ -144,33 +174,98 @@ export default function AppRN() {
           </Pressable>
         }
       />
-      <Animated.FlatList
-        data={new Array(100).fill(0)}
-        style={{ overflow: 'visible' }}
-        contentContainerStyle={{
-          backgroundColor: 'gray',
-          paddingTop: collapsibleHeaderHeight,
+      <PagerView
+        useNext={true}
+        style={{ flex: 1 }}
+        onPageScroll={(e) => {
+          const { position, offset } = e.nativeEvent;
+          animationPagerViewScrollX.setValue(position + offset);
         }}
-        onScroll={onScroll}
-        renderItem={({ index }) => {
-          type ColorIndex = 0 | 1 | 2;
-          const colorIndex: ColorIndex = (index % 3) as ColorIndex;
+      >
+        <Animated.FlatList
+          data={new Array(100).fill(0)}
+          style={{ overflow: 'visible' }}
+          contentContainerStyle={{
+            backgroundColor: 'gray',
+            paddingTop: collapsibleHeaderHeight,
+          }}
+          onScroll={onListScroll}
+          renderItem={({ index }) => {
+            type ColorIndex = 0 | 1 | 2;
+            const colorIndex: ColorIndex = (index % 3) as ColorIndex;
 
-          const colorMap = {
-            '0': 'black',
-            '1': 'green',
-            '2': 'blue',
-          };
+            const colorMap = {
+              '0': '#d11f1f',
+              '1': '#c65252',
+              '2': '#f89797',
+            };
 
-          return (
-            <Pressable onPress={() => console.log(index)}>
-              <View
-                style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
-              />
-            </Pressable>
-          );
-        }}
-      />
+            return (
+              <Pressable onPress={() => console.log(index)}>
+                <View
+                  style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
+                />
+              </Pressable>
+            );
+          }}
+        />
+        <Animated.FlatList
+          initialScrollIndex={0}
+          data={new Array(100).fill(0)}
+          style={{ overflow: 'visible' }}
+          contentContainerStyle={{
+            backgroundColor: 'gray',
+            paddingTop: collapsibleHeaderHeight,
+          }}
+          onScroll={onListScroll}
+          renderItem={({ index }) => {
+            type ColorIndex = 0 | 1 | 2;
+            const colorIndex: ColorIndex = (index % 3) as ColorIndex;
+
+            const colorMap = {
+              '0': '#1fd122',
+              '1': '#40bf47',
+              '2': '#85c386',
+            };
+
+            return (
+              <Pressable onPress={() => console.log(index)}>
+                <View
+                  style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
+                />
+              </Pressable>
+            );
+          }}
+        />
+        <Animated.FlatList
+          initialScrollIndex={0}
+          data={new Array(100).fill(0)}
+          style={{ overflow: 'visible' }}
+          contentContainerStyle={{
+            backgroundColor: 'gray',
+            paddingTop: collapsibleHeaderHeight,
+          }}
+          onScroll={onListScroll}
+          renderItem={({ index }) => {
+            type ColorIndex = 0 | 1 | 2;
+            const colorIndex: ColorIndex = (index % 3) as ColorIndex;
+
+            const colorMap = {
+              '0': '#1f87d1',
+              '1': '#416e8e',
+              '2': '#9bbedd',
+            };
+
+            return (
+              <Pressable onPress={() => console.log(index)}>
+                <View
+                  style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
+                />
+              </Pressable>
+            );
+          }}
+        />
+      </PagerView>
     </View>
   );
 }
