@@ -11,6 +11,12 @@ export default function AppRN() {
   // const stickyHeaderOffsetY = Platform.OS === 'ios' ? 120 : 100;
   // viewPager, TODO: 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
+  const [tabIndex, setTabIndex] = useState<number>(0);
+  const flatListScrollYsRef = useRef({
+    0: 0,
+    1: 0,
+    2: 0,
+  });
 
   // const animationBackgroundColor =
   //   collapsibleHeaderHeight > 0
@@ -37,6 +43,11 @@ export default function AppRN() {
   const onListScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { y: animationListScrollY } } }],
     {
+      listener: (event: any) => {
+        const { y } = event.nativeEvent.contentOffset;
+        // @ts-ignore, 성능 이슈로 인하여 Ref 이용
+        flatListScrollYsRef.current[tabIndex] = y;
+      },
       useNativeDriver: true,
     }
   );
@@ -107,6 +118,8 @@ export default function AppRN() {
                 onPress={() => {
                   console.log('Tab', index);
                   pagerViewRef.current?.setPage(index);
+                  setTabIndex(index);
+                  console.log(flatListScrollYsRef.current);
                 }}
               >
                 <View
