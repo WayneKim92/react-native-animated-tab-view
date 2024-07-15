@@ -101,7 +101,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
 
   useEffect(() => {
     if (onHeaderHeightChange) {
-      onHeaderHeightChange(collapsibleHeaderHeight);
+      onHeaderHeightChange(collapsibleHeaderHeight + stickyHeaderHeight);
     }
   }, [stickyHeaderHeight, collapsibleHeaderHeight, onHeaderHeightChange]); // Add this useEffect
 
