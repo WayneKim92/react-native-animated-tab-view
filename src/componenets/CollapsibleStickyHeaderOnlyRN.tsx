@@ -33,7 +33,8 @@ export const CollapsibleStickyHeaderOnlyRN = (
 
   const [toolBarHeight, setToolBarHeight] = useState(0);
   const toolbarTranslateY = useRef(new Animated.Value(0)).current;
-  const [shouldToolBarDown, setShouldToolBarDown] = useState(true);
+  const [visibleCollapsibleBottomToolBar, setVisibleCollapsibleBottomToolBar] =
+    useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
   const collapsibleHeaderHeaderTranslateY = animationScrollY.interpolate({
@@ -68,7 +69,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
         direction = 'down';
       }
       if (direction !== null && currentScrollY > collapsibleHeaderHeight) {
-        setShouldToolBarDown(direction === 'up');
+        setVisibleCollapsibleBottomToolBar(direction === 'up');
       }
     });
 
@@ -84,7 +85,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
   ]);
 
   useEffect(() => {
-    if (shouldToolBarDown) {
+    if (visibleCollapsibleBottomToolBar) {
       Animated.timing(toolbarTranslateY, {
         toValue: 0,
         duration: 300,
@@ -97,7 +98,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
         useNativeDriver: true,
       }).start();
     }
-  }, [shouldToolBarDown, toolBarHeight, toolbarTranslateY]);
+  }, [visibleCollapsibleBottomToolBar, toolBarHeight, toolbarTranslateY]);
 
   useEffect(() => {
     if (onHeaderHeightChange) {
