@@ -123,7 +123,7 @@ export const CollapsibleStickyHeaderOnlyRN = (
           position: 'absolute',
           height: stickyHeaderOffsetY,
           width: '100%',
-          backgroundColor: 'green',
+          backgroundColor: 'red',
         }}
       />
       {/* Top Header */}
