@@ -8,6 +8,7 @@ export default function AppRN() {
   const animationPagerViewScrollX = useRef(new Animated.Value(0)).current;
   // collapsibleHeaderHeight을 이용하여 FlatList의 paddingTop을 설정합니다!
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
+  const collapsibleStickyHeaderOnlyRNRef = useRef(null);
   // const stickyHeaderOffsetY = Platform.OS === 'ios' ? 120 : 100;
   // viewPager, TODO: 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
@@ -61,6 +62,7 @@ export default function AppRN() {
       }}
     >
       <CollapsibleStickyHeaderOnlyRN
+        ref={collapsibleStickyHeaderOnlyRNRef}
         animationScrollY={animationListScrollY}
         onHeaderHeightChange={setCollapsibleHeaderHeight} // Add this line
         // TopToolbar={
@@ -119,7 +121,17 @@ export default function AppRN() {
                   console.log('Tab', index);
                   pagerViewRef.current?.setPage(index);
                   setTabIndex(index);
-                  console.log(flatListScrollYsRef.current);
+
+                  if (
+                    // @ts-ignore
+                    flatListScrollYsRef.current[index] < collapsibleHeaderHeight
+                  ) {
+                    console.log('펼치자');
+                    collapsibleStickyHeaderOnlyRNRef.current?.expand();
+                  } else {
+                    console.log('접자');
+                    collapsibleStickyHeaderOnlyRNRef.current?.collapse();
+                  }
                 }}
               >
                 <View
