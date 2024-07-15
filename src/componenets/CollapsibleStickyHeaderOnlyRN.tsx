@@ -34,16 +34,16 @@ export const CollapsibleStickyHeaderOnlyRN = (
   useEffect(() => {
     const id = animationScrollY.addListener((state) => {
       const currentScrollY = state.value;
+
+      // Collapsible Toolbar 처리 로직
       const deltaY = currentScrollY - lastScrollY;
       setLastScrollY(currentScrollY);
-
       let direction = null;
       if (deltaY < 0) {
         direction = 'up';
       } else if (deltaY > 0) {
         direction = 'down';
       }
-
       if (direction !== null && currentScrollY > collapsibleHeaderHeight) {
         setShouldToolBarDown(direction === 'up');
       }
