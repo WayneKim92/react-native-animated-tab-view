@@ -12530,7 +12530,7 @@ __metadata:
     react-dom: 18.2.0
     react-native: 0.74.3
     react-native-pager-view: 6.3.1
-    react-native-reanimated: 3.8.1
+    react-native-reanimated: 3.14.0
     react-native-web: ~0.19.10
   languageName: unknown
   linkType: soft
@@ -12555,7 +12555,7 @@ __metadata:
     react: 18.2.0
     react-native: 0.74.3
     react-native-builder-bob: ^0.26.0
-    react-native-reanimated: 3.8.1
+    react-native-reanimated: 3.14.0
     release-it: ^15.0.0
     typescript: ^5.2.2
   peerDependencies:
@@ -12575,9 +12575,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-native-reanimated@npm:3.8.1":
-  version: 3.8.1
-  resolution: "react-native-reanimated@npm:3.8.1"
+"react-native-reanimated@npm:3.14.0":
+  version: 3.14.0
+  resolution: "react-native-reanimated@npm:3.14.0"
   dependencies:
     "@babel/plugin-transform-arrow-functions": ^7.0.0-0
     "@babel/plugin-transform-nullish-coalescing-operator": ^7.0.0-0
@@ -12591,7 +12591,7 @@ __metadata:
     "@babel/core": ^7.0.0-0
     react: "*"
     react-native: "*"
-  checksum: 078a1e32ce1ca11488862db90663fd5cacb61aea65dc540c90cd5346d97e63cc6836f25cfc48b7acefd301fda414f05329a92ae5cb28fb83b94c571e66f147e3
+  checksum: 31eb58d1c7fbd233ce789de2f63779f485f07708e0a4168866ab9dfce555e970079a84ca34eef9cfb06ee48cfa9e1b0e452407a7938c066393034c046642a855
   languageName: node
   linkType: hard
 
