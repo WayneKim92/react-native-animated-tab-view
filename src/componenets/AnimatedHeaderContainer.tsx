@@ -5,7 +5,8 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Animated, type ViewStyle } from 'react-native';
+import { Animated, Easing, type ViewStyle } from 'react-native';
+import type { EasingFunction } from 'react-native/Libraries/Animated/Easing';
 
 interface AnimatedHeaderContainerProps {
   animatedScrollY: Animated.Value;
@@ -20,9 +21,13 @@ interface AnimatedHeaderContainerProps {
     bottomToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
   };
   animationOptions?: {
-    durations?: {
+    duration?: {
       collapsibleHeader?: number;
       bottomToolBar?: number;
+    };
+    easing?: {
+      collapsibleHeader?: EasingFunction;
+      bottomToolBar?: EasingFunction;
     };
   };
   onHeaderHeightChange: (height: number) => void;
@@ -60,14 +65,20 @@ export const AnimatedHeaderContainer = forwardRef(
       expand: (lastValue: number) => {
         Animated.timing(animatedScrollY, {
           toValue: lastValue,
-          duration: animationOptions?.durations?.collapsibleHeader ?? 200,
+          duration: animationOptions?.duration?.collapsibleHeader ?? 300,
+          easing:
+            Easing.out(Easing.quad) ??
+            animationOptions?.easing?.collapsibleHeader,
           useNativeDriver: true,
         }).start();
       },
       collapse: () => {
         Animated.timing(animatedScrollY, {
           toValue: collapsibleHeaderHeight,
-          duration: animationOptions?.durations?.collapsibleHeader ?? 200,
+          duration: animationOptions?.duration?.collapsibleHeader ?? 300,
+          easing:
+            Easing.out(Easing.quad) ??
+            animationOptions?.easing?.collapsibleHeader,
           useNativeDriver: true,
         }).start();
       },
@@ -117,7 +128,7 @@ export const AnimatedHeaderContainer = forwardRef(
 
           Animated.timing(bottomToolBarTranslateY, {
             toValue: direction === 'up' ? 0 : -bottomToolBarHeight,
-            duration: animationOptions?.durations?.bottomToolBar ?? 300,
+            duration: animationOptions?.duration?.bottomToolBar ?? 300,
             useNativeDriver: true,
           }).start(() => {
             isBottomToolbarTranslateYAnimationRunning.current = false;

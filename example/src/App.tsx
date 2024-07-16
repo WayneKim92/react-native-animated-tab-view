@@ -12,23 +12,24 @@ import { AnimatedHeaderContainer } from 'react-native-header-components';
 import { useRef, useState } from 'react';
 import PagerView from 'react-native-pager-view';
 
+const TabCount = 3;
+
 export default function App() {
   const animatedScrollY = useRef(new Animated.Value(0)).current;
   const animationScrollX = useRef(new Animated.Value(0)).current;
   const animationActiveTabPosition = useRef(new Animated.Value(0)).current;
 
-  // collapsibleHeaderHeight을 이용하여 FlatList의 paddingTop을 설정합니다!
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
   const animatedHeaderContainerRef = useRef<{
     expand: (value: number) => void;
     collapse: () => void;
   }>(null);
-  // viewPager, TODO: 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의
+  // viewPager 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의함
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
-  const tabCount = 3;
+
   const tabIndexRef = useRef<number>(0);
   const flatListScrollYsRef = useRef(
-    new Array(tabCount).fill(0).reduce((acc, _, index) => {
+    new Array(TabCount).fill(0).reduce((acc, _, index) => {
       acc[index] = 0;
       return acc;
     }, {})
@@ -77,20 +78,13 @@ export default function App() {
   // Animated.event 내에서 갱신 된 값 참조 불가하여, 일반 함수로 변경
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { y } = event.nativeEvent.contentOffset;
-    // @ts-ignore
     flatListScrollYsRef.current[tabIndexRef.current] = y;
     animatedScrollY.setValue(y);
     isScrollingRef.current = true;
   };
 
-  // @ts-ignore
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: 'gray',
-      }}
-    >
+    <View style={{ flex: 1 }}>
       <AnimatedHeaderContainer
         ref={animatedHeaderContainerRef}
         animatedScrollY={animatedScrollY}
@@ -145,7 +139,7 @@ export default function App() {
         stickyHeaderOffsetY={stickyHeaderOffsetY}
         StickyHeader={
           <View style={{ flexDirection: 'row' }}>
-            {new Array(tabCount).fill(0).map((_, index) => (
+            {new Array(TabCount).fill(0).map((_, index) => (
               <Pressable
                 key={index}
                 onPress={() => {
@@ -160,7 +154,7 @@ export default function App() {
                   style={{
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: Dimensions.get('window').width / tabCount,
+                    width: Dimensions.get('window').width / TabCount,
                     height: 60,
                     backgroundColor: 'gray',
                   }}
@@ -171,7 +165,7 @@ export default function App() {
             ))}
             <Animated.View
               style={{
-                width: Dimensions.get('window').width / tabCount,
+                width: Dimensions.get('window').width / TabCount,
                 height: 5,
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 position: 'absolute',
@@ -183,8 +177,8 @@ export default function App() {
                       inputRange: [0, 1, 2],
                       outputRange: [
                         0,
-                        Dimensions.get('window').width / tabCount,
-                        (Dimensions.get('window').width / tabCount) * 2,
+                        Dimensions.get('window').width / TabCount,
+                        (Dimensions.get('window').width / TabCount) * 2,
                       ],
                     }),
                   },
@@ -200,7 +194,7 @@ export default function App() {
               transform: [{ translateX: animationScrollX }],
             }}
           >
-            {new Array(tabCount).fill(0).map((_, index) => {
+            {new Array(TabCount).fill(0).map((_, index) => {
               const colorMap = {
                 '0': '#1fd1b6',
                 '1': '#2c4b9a',
@@ -245,19 +239,12 @@ export default function App() {
           tabIndexRef.current = position;
           animationScrollX.setValue(-Dimensions.get('window').width * position);
 
-          if (
-            // @ts-ignore
-            flatListScrollYsRef.current[position] < collapsibleHeaderHeight
-          ) {
+          if (flatListScrollYsRef.current[position] < collapsibleHeaderHeight) {
             animatedHeaderContainerRef.current?.expand(
-              // @ts-ignore
               flatListScrollYsRef.current[position]
             );
           } else {
-            animatedHeaderContainerRef.current?.collapse(
-              // @ts-ignore
-              flatListScrollYsRef.current[position]
-            );
+            animatedHeaderContainerRef.current?.collapse();
           }
         }}
         onPageScroll={(e) => {
@@ -265,7 +252,7 @@ export default function App() {
           animationActiveTabPosition.setValue(position + offset);
         }}
       >
-        {new Array(tabCount).fill(0).map((_, index) => {
+        {new Array(TabCount).fill(0).map((_, index) => {
           const colorMaps = [
             {
               '0': '#d11f1f',
