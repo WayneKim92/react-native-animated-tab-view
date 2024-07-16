@@ -18,6 +18,12 @@ interface AnimatedHeaderContainerProps {
     stickyHeaderStyle?: Animated.WithAnimatedValue<ViewStyle>;
     bottomToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
   };
+  animationOptions?: {
+    durations?: {
+      collapsibleHeader?: number;
+      bottomToolBar?: number;
+    };
+  };
   onHeaderHeightChange: (height: number) => void;
   TopToolbar?: React.ReactNode;
   CollapsibleHeader: React.ReactNode;
@@ -30,12 +36,13 @@ export const AnimatedHeaderContainer = forwardRef(
     const {
       styles,
       animatedScrollY,
+      animationOptions,
+      onHeaderHeightChange,
       CollapsibleHeader,
       TopToolbar,
       StickyHeader,
       stickyHeaderOffsetY = 0,
       BottomToolBar,
-      onHeaderHeightChange,
     } = props;
 
     const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] =
@@ -51,15 +58,15 @@ export const AnimatedHeaderContainer = forwardRef(
     useImperativeHandle(ref, () => ({
       expand: (lastValue: number) => {
         Animated.timing(animatedScrollY, {
-          toValue: lastValue, // Assuming 0 is the expanded state
-          duration: 200,
+          toValue: lastValue,
+          duration: animationOptions?.durations?.collapsibleHeader ?? 200,
           useNativeDriver: true,
         }).start();
       },
       collapse: () => {
         Animated.timing(animatedScrollY, {
-          toValue: collapsibleHeaderHeight, // Assuming 0 is the expanded state
-          duration: 200,
+          toValue: collapsibleHeaderHeight,
+          duration: animationOptions?.durations?.collapsibleHeader ?? 200,
           useNativeDriver: true,
         }).start();
       },
@@ -109,7 +116,7 @@ export const AnimatedHeaderContainer = forwardRef(
 
           Animated.timing(bottomToolBarTranslateY, {
             toValue: direction === 'up' ? 0 : -bottomToolBarHeight,
-            duration: 300,
+            duration: animationOptions?.durations?.bottomToolBar ?? 300,
             useNativeDriver: true,
           }).start(() => {
             isBottomToolbarTranslateYAnimationRunning.current = false;
@@ -128,6 +135,7 @@ export const AnimatedHeaderContainer = forwardRef(
       bottomToolBarHeight,
       bottomToolBarTranslateY,
       BottomToolBar,
+      animationOptions,
     ]);
 
     useEffect(() => {
@@ -148,7 +156,7 @@ export const AnimatedHeaderContainer = forwardRef(
           styles?.containerStyle,
         ]}
       >
-        {/* Cover, Sticky Header에 offset이 적용되었을 때, Header 뒤에 있는 요소 안 보이게 처리 */}
+        {/* Cover */}
         <Animated.View
           style={[
             {
@@ -160,7 +168,8 @@ export const AnimatedHeaderContainer = forwardRef(
             styles?.coverStyle,
           ]}
         />
-        {/* Top Header */}
+
+        {/* TopToolbar */}
         {TopToolbar && (
           <Animated.View
             style={[
@@ -176,7 +185,7 @@ export const AnimatedHeaderContainer = forwardRef(
           </Animated.View>
         )}
 
-        {/* Collapsible Header */}
+        {/* CollapsibleHeader */}
         <Animated.View
           style={{
             transform: [{ translateY: collapsibleHeaderHeaderTranslateY }],
@@ -202,9 +211,12 @@ export const AnimatedHeaderContainer = forwardRef(
             setStickyHeaderHeight(event.nativeEvent.layout.height);
           }}
         >
+          {/* StickyHeader */}
           <Animated.View style={[{ zIndex: 2 }, styles?.stickyHeaderStyle]}>
             {StickyHeader}
           </Animated.View>
+
+          {/* BottomToolBar */}
           <Animated.View
             style={[
               {
