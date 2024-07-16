@@ -34,7 +34,6 @@ export default function App() {
       return acc;
     }, {})
   );
-  const isScrollingRef = useRef(false);
 
   const stickyHeaderOffsetY = 100;
   const animationBackgroundColor =
@@ -80,7 +79,6 @@ export default function App() {
     const { y } = event.nativeEvent.contentOffset;
     flatListScrollYsRef.current[tabIndexRef.current] = y;
     animatedScrollY.setValue(y);
-    isScrollingRef.current = true;
   };
 
   return (
@@ -143,10 +141,6 @@ export default function App() {
               <Pressable
                 key={index}
                 onPress={() => {
-                  if (isScrollingRef.current) {
-                    return;
-                  }
-
                   pagerViewRef.current?.setPage(index);
                 }}
               >
@@ -280,9 +274,6 @@ export default function App() {
                 paddingTop: collapsibleHeaderHeight,
               }}
               onScroll={onScroll}
-              onMomentumScrollEnd={() => {
-                isScrollingRef.current = false;
-              }}
               renderItem={({ index: i }) => {
                 const colorMap = colorMaps[index] ?? {
                   0: 'red',
