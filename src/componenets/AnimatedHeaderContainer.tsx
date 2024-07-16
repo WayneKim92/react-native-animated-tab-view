@@ -15,6 +15,7 @@ interface AnimatedHeaderContainerProps {
     coverStyle?: Animated.WithAnimatedValue<ViewStyle>;
     topToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
     bottomToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
+    stickyHeaderAndBottomToolBarContainerStyle?: Animated.WithAnimatedValue<ViewStyle>;
   };
   onHeaderHeightChange: (height: number) => void;
   TopToolbar?: React.ReactNode;
@@ -186,13 +187,16 @@ export const AnimatedHeaderContainer = forwardRef(
           {CollapsibleHeader}
         </Animated.View>
 
-        {/* Sticky Header and Collapsible Sticky Toolbar*/}
+        {/* StickyHeader and BottomToolBar Container*/}
         <Animated.View
           pointerEvents={'box-none'}
-          style={{
-            zIndex: 2,
-            transform: [{ translateY: stickyHeaderHeaderTranslateY }],
-          }}
+          style={[
+            {
+              zIndex: 2,
+              transform: [{ translateY: stickyHeaderHeaderTranslateY }],
+            },
+            styles?.stickyHeaderAndBottomToolBarContainerStyle,
+          ]}
           onLayout={(event) => {
             setStickyHeaderHeight(event.nativeEvent.layout.height);
           }}
