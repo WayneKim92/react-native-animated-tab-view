@@ -14,6 +14,7 @@ interface AnimatedHeaderContainerProps {
     containerStyle?: Animated.WithAnimatedValue<ViewStyle>;
     coverStyle?: Animated.WithAnimatedValue<ViewStyle>;
     topToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
+    collapsibleHeaderStyle?: Animated.WithAnimatedValue<ViewStyle>;
     stickyHeaderAndBottomToolBarContainerStyle?: Animated.WithAnimatedValue<ViewStyle>;
     stickyHeaderStyle?: Animated.WithAnimatedValue<ViewStyle>;
     bottomToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
@@ -187,9 +188,10 @@ export const AnimatedHeaderContainer = forwardRef(
 
         {/* CollapsibleHeader */}
         <Animated.View
-          style={{
-            transform: [{ translateY: collapsibleHeaderHeaderTranslateY }],
-          }}
+          style={[
+            { transform: [{ translateY: collapsibleHeaderHeaderTranslateY }] },
+            styles?.collapsibleHeaderStyle,
+          ]}
           onLayout={(event) => {
             setCollapsibleHeaderHeight(event.nativeEvent.layout.height);
           }}
