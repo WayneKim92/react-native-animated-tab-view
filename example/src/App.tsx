@@ -64,6 +64,15 @@ export default function App() {
     console.log(flatListScrollYsRef.current);
   };
 
+  const bottomToolBarTranslateX = animationPagerViewScrollX.interpolate({
+    inputRange: [0, 1, 2],
+    outputRange: [
+      0,
+      -Dimensions.get('window').width,
+      -Dimensions.get('window').width * 2,
+    ],
+  });
+
   // @ts-ignore
   return (
     <View
@@ -192,23 +201,45 @@ export default function App() {
           </View>
         }
         BottomToolBar={
-          <Pressable
-            onPress={() => {
-              console.log('Bottom Toolbar');
+          <Animated.View
+            style={{
+              flexDirection: 'row',
+              transform: [{ translateX: bottomToolBarTranslateX }],
             }}
           >
-            <View
-              style={{
-                zIndex: 1,
-                backgroundColor: 'pink',
-                height: 50,
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Text>Bottom Toolbar</Text>
-            </View>
-          </Pressable>
+            {new Array(3).fill(0).map((_, index) => {
+              const colorMap = {
+                '0': '#1fd1b6',
+                '1': '#51bdad',
+                '2': '#8fb5ae',
+              };
+
+              // @ts-ignore
+              const backgroundColor = colorMap[index] ?? 'gray';
+
+              return (
+                <Pressable
+                  key={index}
+                  onPress={() => {
+                    console.log('Bottom Toolbar');
+                  }}
+                >
+                  <View
+                    style={{
+                      zIndex: 1,
+                      height: 50,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: Dimensions.get('window').width,
+                      backgroundColor: backgroundColor,
+                    }}
+                  >
+                    <Text>Bottom Toolbar {index}</Text>
+                  </View>
+                </Pressable>
+              );
+            })}
+          </Animated.View>
         }
       />
       <PagerView
@@ -270,7 +301,6 @@ export default function App() {
           }}
         />
         <Animated.FlatList
-          initialScrollIndex={0}
           data={new Array(100).fill(0)}
           contentContainerStyle={{
             backgroundColor: 'gray',
@@ -300,7 +330,6 @@ export default function App() {
           }}
         />
         <Animated.FlatList
-          initialScrollIndex={0}
           data={new Array(100).fill(0)}
           contentContainerStyle={{
             backgroundColor: 'gray',
