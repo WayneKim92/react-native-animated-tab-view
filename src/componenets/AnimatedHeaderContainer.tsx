@@ -8,6 +8,11 @@ import React, {
 import { Animated, Easing, type ViewStyle } from 'react-native';
 import type { EasingFunction } from 'react-native/Libraries/Animated/Easing';
 
+export interface AnimatedHeaderContainerRef {
+  expand: (value: number) => void;
+  collapse: () => void;
+}
+
 interface AnimatedHeaderContainerProps {
   animatedScrollY: Animated.Value;
   stickyHeaderOffsetY?: number;

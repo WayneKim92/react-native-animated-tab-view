@@ -8,7 +8,10 @@ import {
   type NativeScrollEvent,
   Platform,
 } from 'react-native';
-import { AnimatedHeaderContainer } from 'react-native-header-components';
+import {
+  AnimatedHeaderContainer,
+  type AnimatedHeaderContainerRef,
+} from 'react-native-header-components';
 import { useRef, useState } from 'react';
 import PagerView from 'react-native-pager-view';
 
@@ -20,10 +23,7 @@ export default function App() {
   const animationActiveTabPosition = useRef(new Animated.Value(0)).current;
 
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
-  const animatedHeaderContainerRef = useRef<{
-    expand: (value: number) => void;
-    collapse: () => void;
-  }>(null);
+  const animatedHeaderContainerRef = useRef<AnimatedHeaderContainerRef>(null);
   // viewPager 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의함
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
 

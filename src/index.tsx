@@ -1,1 +1,4 @@
-export { AnimatedHeaderContainer } from './componenets/AnimatedHeaderContainer';
+export {
+  AnimatedHeaderContainer,
+  type AnimatedHeaderContainerRef,
+} from './componenets/AnimatedHeaderContainer';
