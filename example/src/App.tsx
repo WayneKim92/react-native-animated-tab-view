@@ -21,12 +21,10 @@ export default function App() {
   const animatedScrollY = useRef(new Animated.Value(0)).current;
   const animationScrollX = useRef(new Animated.Value(0)).current;
   const animationActiveTabPosition = useRef(new Animated.Value(0)).current;
-
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
   const animatedHeaderContainerRef = useRef<AnimatedHeaderContainerRef>(null);
   // viewPager 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의함
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
-
   const activeTabIndexRef = useRef<number>(0);
   const flatListScrollYsRef = useRef(
     new Array(TabCount).fill(0).reduce((acc, _, index) => {
@@ -140,9 +138,7 @@ export default function App() {
             {new Array(TabCount).fill(0).map((_, index) => (
               <Pressable
                 key={index}
-                onPress={() => {
-                  pagerViewRef.current?.setPage(index);
-                }}
+                onPress={() => pagerViewRef.current?.setPage(index)}
               >
                 <View
                   style={{
