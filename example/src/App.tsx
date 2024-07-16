@@ -8,32 +8,32 @@ import {
   type NativeScrollEvent,
   Platform,
 } from 'react-native';
-import { CollapsibleStickyHeader } from 'react-native-header-components';
+import {
+  AnimatedHeaderContainer,
+  type AnimatedHeaderContainerRef,
+} from 'react-native-header-components';
 import { useRef, useState } from 'react';
 import PagerView from 'react-native-pager-view';
+
+const TabCount = 3;
 
 export default function App() {
   const animatedScrollY = useRef(new Animated.Value(0)).current;
   const animationScrollX = useRef(new Animated.Value(0)).current;
   const animationActiveTabPosition = useRef(new Animated.Value(0)).current;
-
-  // collapsibleHeaderHeight을 이용하여 FlatList의 paddingTop을 설정합니다!
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
-  const collapsibleStickyHeaderOnlyRNRef = useRef<{
-    expand: (value: number) => void;
-    collapse: () => void;
-  }>(null);
-  const stickyHeaderOffsetY = 60;
-  // viewPager, TODO: 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의
+  const animatedHeaderContainerRef = useRef<AnimatedHeaderContainerRef>(null);
+  // viewPager 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의함
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
-  const tabIndexRef = useRef<number>(0);
-  const flatListScrollYsRef = useRef({
-    0: 0,
-    1: 0,
-    2: 0,
-  });
-  const isScrollingRef = useRef(false);
+  const activeTabIndexRef = useRef<number>(0);
+  const flatListScrollYsRef = useRef(
+    new Array(TabCount).fill(0).reduce((acc, _, index) => {
+      acc[index] = 0;
+      return acc;
+    }, {})
+  );
 
+  const stickyHeaderOffsetY = 100;
   const animationBackgroundColor =
     collapsibleHeaderHeight > 0
       ? animatedScrollY.interpolate({
@@ -75,37 +75,29 @@ export default function App() {
   // Animated.event 내에서 갱신 된 값 참조 불가하여, 일반 함수로 변경
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { y } = event.nativeEvent.contentOffset;
-    // @ts-ignore
-    flatListScrollYsRef.current[tabIndexRef.current] = y;
+    flatListScrollYsRef.current[activeTabIndexRef.current] = y;
     animatedScrollY.setValue(y);
-    isScrollingRef.current = true;
   };
 
-  // @ts-ignore
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: 'gray',
-      }}
-    >
-      <CollapsibleStickyHeader
-        ref={collapsibleStickyHeaderOnlyRNRef}
+    <View style={{ flex: 1 }}>
+      <AnimatedHeaderContainer
+        ref={animatedHeaderContainerRef}
         animatedScrollY={animatedScrollY}
-        onHeaderHeightChange={setCollapsibleHeaderHeight} // Add this line
+        onHeaderHeightChange={setCollapsibleHeaderHeight}
+        styles={{
+          topToolBarStyle: {
+            paddingTop: 40,
+            backgroundColor: animationBackgroundColor,
+          },
+        }}
         TopToolbar={
-          <Animated.View
+          <View
             style={{
-              paddingTop: stickyHeaderOffsetY,
-              alignSelf: 'stretch',
-              backgroundColor: animationBackgroundColor,
-              flex: 1,
               flexDirection: 'row',
+              padding: 16,
+              alignSelf: 'stretch',
               justifyContent: 'space-between',
-              paddingHorizontal: 16,
-              position: 'absolute',
-              width: '100%',
-              zIndex: 3,
             }}
           >
             <Pressable onPress={() => console.log('Left')}>
@@ -119,7 +111,7 @@ export default function App() {
                 Right
               </Text>
             </Pressable>
-          </Animated.View>
+          </View>
         }
         CollapsibleHeader={
           <Pressable
@@ -140,43 +132,19 @@ export default function App() {
             </View>
           </Pressable>
         }
-        stickyHeaderOffsetY={stickyHeaderOffsetY + 30}
+        stickyHeaderOffsetY={stickyHeaderOffsetY}
         StickyHeader={
           <View style={{ flexDirection: 'row' }}>
-            {new Array(3).fill(0).map((_, index) => (
+            {new Array(TabCount).fill(0).map((_, index) => (
               <Pressable
                 key={index}
-                onPress={() => {
-                  console.log('탭 누름', flatListScrollYsRef.current);
-                  if (isScrollingRef.current) {
-                    console.log('스크롤 중이라 선택 불가');
-                    return;
-                  }
-
-                  tabIndexRef.current = index;
-                  pagerViewRef.current?.setPage(index);
-
-                  if (
-                    // @ts-ignore
-                    flatListScrollYsRef.current[index] < collapsibleHeaderHeight
-                  ) {
-                    collapsibleStickyHeaderOnlyRNRef.current?.expand(
-                      // @ts-ignore
-                      flatListScrollYsRef.current[index]
-                    );
-                  } else {
-                    collapsibleStickyHeaderOnlyRNRef.current?.collapse(
-                      // @ts-ignore
-                      flatListScrollYsRef.current[index]
-                    );
-                  }
-                }}
+                onPress={() => pagerViewRef.current?.setPage(index)}
               >
                 <View
                   style={{
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: Dimensions.get('window').width / 3,
+                    width: Dimensions.get('window').width / TabCount,
                     height: 60,
                     backgroundColor: 'gray',
                   }}
@@ -187,7 +155,7 @@ export default function App() {
             ))}
             <Animated.View
               style={{
-                width: Dimensions.get('window').width / 3,
+                width: Dimensions.get('window').width / TabCount,
                 height: 5,
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 position: 'absolute',
@@ -199,8 +167,8 @@ export default function App() {
                       inputRange: [0, 1, 2],
                       outputRange: [
                         0,
-                        Dimensions.get('window').width / 3,
-                        (Dimensions.get('window').width / 3) * 2,
+                        Dimensions.get('window').width / TabCount,
+                        (Dimensions.get('window').width / TabCount) * 2,
                       ],
                     }),
                   },
@@ -216,7 +184,7 @@ export default function App() {
               transform: [{ translateX: animationScrollX }],
             }}
           >
-            {new Array(3).fill(0).map((_, index) => {
+            {new Array(TabCount).fill(0).map((_, index) => {
               const colorMap = {
                 '0': '#1fd1b6',
                 '1': '#2c4b9a',
@@ -258,22 +226,15 @@ export default function App() {
         style={{ flex: 1 }}
         onPageSelected={(event) => {
           const { position } = event.nativeEvent;
-          tabIndexRef.current = position;
+          activeTabIndexRef.current = position;
           animationScrollX.setValue(-Dimensions.get('window').width * position);
 
-          if (
-            // @ts-ignore
-            flatListScrollYsRef.current[position] < collapsibleHeaderHeight
-          ) {
-            collapsibleStickyHeaderOnlyRNRef.current?.expand(
-              // @ts-ignore
+          if (flatListScrollYsRef.current[position] < collapsibleHeaderHeight) {
+            animatedHeaderContainerRef.current?.expand(
               flatListScrollYsRef.current[position]
             );
           } else {
-            collapsibleStickyHeaderOnlyRNRef.current?.collapse(
-              // @ts-ignore
-              flatListScrollYsRef.current[position]
-            );
+            animatedHeaderContainerRef.current?.collapse();
           }
         }}
         onPageScroll={(e) => {
@@ -281,93 +242,54 @@ export default function App() {
           animationActiveTabPosition.setValue(position + offset);
         }}
       >
-        <Animated.FlatList
-          data={new Array(100).fill(0)}
-          contentContainerStyle={{
-            backgroundColor: 'gray',
-            paddingTop: collapsibleHeaderHeight,
-          }}
-          onScroll={onScroll}
-          onMomentumScrollEnd={() => {
-            isScrollingRef.current = false;
-          }}
-          renderItem={({ index }) => {
-            type ColorIndex = 0 | 1 | 2;
-            const colorIndex: ColorIndex = (index % 3) as ColorIndex;
-
-            const colorMap = {
+        {new Array(TabCount).fill(0).map((_, index) => {
+          const colorMaps = [
+            {
               '0': '#d11f1f',
               '1': '#c65252',
               '2': '#f89797',
-            };
-
-            return (
-              <Pressable onPress={() => console.log(index)}>
-                <View
-                  style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
-                />
-              </Pressable>
-            );
-          }}
-        />
-        <Animated.FlatList
-          data={new Array(100).fill(0)}
-          contentContainerStyle={{
-            backgroundColor: 'gray',
-            paddingTop: collapsibleHeaderHeight,
-          }}
-          onScroll={onScroll}
-          onMomentumScrollEnd={() => {
-            isScrollingRef.current = false;
-          }}
-          renderItem={({ index }) => {
-            type ColorIndex = 0 | 1 | 2;
-            const colorIndex: ColorIndex = (index % 3) as ColorIndex;
-
-            const colorMap = {
+            },
+            {
               '0': '#1fd122',
               '1': '#40bf47',
               '2': '#85c386',
-            };
-
-            return (
-              <Pressable onPress={() => console.log(index)}>
-                <View
-                  style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
-                />
-              </Pressable>
-            );
-          }}
-        />
-        <Animated.FlatList
-          data={new Array(100).fill(0)}
-          contentContainerStyle={{
-            backgroundColor: 'gray',
-            paddingTop: collapsibleHeaderHeight,
-          }}
-          onScroll={onScroll}
-          onMomentumScrollEnd={() => {
-            isScrollingRef.current = false;
-          }}
-          renderItem={({ index }) => {
-            type ColorIndex = 0 | 1 | 2;
-            const colorIndex: ColorIndex = (index % 3) as ColorIndex;
-
-            const colorMap = {
+            },
+            {
               '0': '#1f87d1',
               '1': '#416e8e',
               '2': '#9bbedd',
-            };
+            },
+          ];
 
-            return (
-              <Pressable onPress={() => console.log(index)}>
-                <View
-                  style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
-                />
-              </Pressable>
-            );
-          }}
-        />
+          return (
+            <Animated.FlatList
+              key={index}
+              data={new Array(100).fill(0)}
+              contentContainerStyle={{
+                backgroundColor: 'gray',
+                paddingTop: collapsibleHeaderHeight,
+              }}
+              onScroll={onScroll}
+              renderItem={({ index: i }) => {
+                const colorMap = colorMaps[index] ?? {
+                  0: 'red',
+                  1: 'green',
+                  2: 'blue',
+                };
+                // @ts-ignore
+                const backgroundColor = colorMap[i % 3] ?? 'gray';
+
+                return (
+                  <Pressable onPress={() => console.log(index)}>
+                    <View
+                      style={{ height: 50, backgroundColor: backgroundColor }}
+                    />
+                  </Pressable>
+                );
+              }}
+            />
+          );
+        })}
       </PagerView>
     </View>
   );
