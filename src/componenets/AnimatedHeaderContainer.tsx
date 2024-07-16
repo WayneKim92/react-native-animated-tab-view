@@ -10,11 +10,11 @@ import { Animated, View, type ViewStyle } from 'react-native';
 interface AnimatedHeaderContainerProps {
   animatedScrollY: Animated.Value;
   stickyHeaderOffsetY?: number;
-  collapsibleBottomToolBar?: boolean;
   styles?: {
     containerStyle?: Animated.WithAnimatedValue<ViewStyle>;
     coverStyle?: Animated.WithAnimatedValue<ViewStyle>;
     topToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
+    bottomToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
   };
   onHeaderHeightChange: (height: number) => void;
   TopToolbar?: React.ReactNode;
@@ -33,7 +33,6 @@ export const AnimatedHeaderContainer = forwardRef(
       StickyHeader,
       stickyHeaderOffsetY = 0,
       BottomToolBar,
-      collapsibleBottomToolBar = true,
       onHeaderHeightChange,
     } = props;
 
@@ -42,9 +41,9 @@ export const AnimatedHeaderContainer = forwardRef(
     const [stickyHeaderHeight, setStickyHeaderHeight] = useState<number>(0);
     const stickyHeaderHeaderTranslateY = useRef(new Animated.Value(0)).current;
 
-    const [toolBarHeight, setToolBarHeight] = useState(0);
-    const toolbarTranslateY = useRef(new Animated.Value(0)).current;
-    const isToolbarTranslateYAnimationRunning = useRef(false);
+    const [bottomToolBarHeight, setBottomToolBarHeight] = useState(0);
+    const bottomToolBarTranslateY = useRef(new Animated.Value(0)).current;
+    const isBottomToolbarTranslateYAnimationRunning = useRef(false);
     const lastScrollYRef = useRef(0);
 
     useImperativeHandle(ref, () => ({
@@ -96,18 +95,22 @@ export const AnimatedHeaderContainer = forwardRef(
           direction = 'down';
         }
 
-        if (direction !== null && currentScrollY > collapsibleHeaderHeight) {
-          if (isToolbarTranslateYAnimationRunning.current) {
+        if (
+          BottomToolBar &&
+          direction !== null &&
+          currentScrollY > collapsibleHeaderHeight
+        ) {
+          if (isBottomToolbarTranslateYAnimationRunning.current) {
             return;
           }
-          isToolbarTranslateYAnimationRunning.current = true;
+          isBottomToolbarTranslateYAnimationRunning.current = true;
 
-          Animated.timing(toolbarTranslateY, {
-            toValue: direction === 'up' ? 0 : -toolBarHeight,
+          Animated.timing(bottomToolBarTranslateY, {
+            toValue: direction === 'up' ? 0 : -bottomToolBarHeight,
             duration: 300,
             useNativeDriver: true,
           }).start(() => {
-            isToolbarTranslateYAnimationRunning.current = false;
+            isBottomToolbarTranslateYAnimationRunning.current = false;
           });
         }
       });
@@ -120,8 +123,9 @@ export const AnimatedHeaderContainer = forwardRef(
       collapsibleHeaderHeight,
       stickyHeaderHeaderTranslateY,
       stickyHeaderOffsetY,
-      toolBarHeight,
-      toolbarTranslateY,
+      bottomToolBarHeight,
+      bottomToolBarTranslateY,
+      BottomToolBar,
     ]);
 
     useEffect(() => {
@@ -196,15 +200,14 @@ export const AnimatedHeaderContainer = forwardRef(
           <View style={{ zIndex: 2 }}>{StickyHeader}</View>
           <Animated.View
             style={[
-              { zIndex: 1 },
               {
-                transform: collapsibleBottomToolBar
-                  ? [{ translateY: toolbarTranslateY }]
-                  : undefined,
+                zIndex: 1,
+                transform: [{ translateY: bottomToolBarTranslateY }],
               },
+              styles?.bottomToolBarStyle,
             ]}
             onLayout={(event) => {
-              setToolBarHeight(event.nativeEvent.layout.height);
+              setBottomToolBarHeight(event.nativeEvent.layout.height);
             }}
           >
             {BottomToolBar}

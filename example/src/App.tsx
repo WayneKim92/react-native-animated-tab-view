@@ -149,29 +149,11 @@ export default function App() {
               <Pressable
                 key={index}
                 onPress={() => {
-                  console.log('탭 누름', flatListScrollYsRef.current);
                   if (isScrollingRef.current) {
-                    console.log('스크롤 중이라 선택 불가');
                     return;
                   }
 
-                  tabIndexRef.current = index;
                   pagerViewRef.current?.setPage(index);
-
-                  if (
-                    // @ts-ignore
-                    flatListScrollYsRef.current[index] < collapsibleHeaderHeight
-                  ) {
-                    animatedHeaderContainerRef.current?.expand(
-                      // @ts-ignore
-                      flatListScrollYsRef.current[index]
-                    );
-                  } else {
-                    animatedHeaderContainerRef.current?.collapse(
-                      // @ts-ignore
-                      flatListScrollYsRef.current[index]
-                    );
-                  }
                 }}
               >
                 <View
