@@ -1,1 +1,1 @@
-export { CollapsibleStickyHeader } from './componenets/CollapsibleStickyHeader';
+export { AnimatedHeaderContainer } from './componenets/AnimatedHeaderContainer';

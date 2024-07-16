@@ -5,24 +5,28 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Animated, View, type ViewStyle } from 'react-native';
+import { Animated, Platform, View, type ViewStyle } from 'react-native';
 
-interface CollapsibleStickyHeaderProps {
+interface AnimatedHeaderContainerProps {
   animatedScrollY: Animated.Value;
-  onHeaderHeightChange: (height: number) => void;
-  CollapsibleHeader: React.ReactNode;
-  TopToolbar?: React.ReactNode;
-  StickyHeader?: React.ReactNode;
   stickyHeaderOffsetY?: number;
-  BottomToolBar?: React.ReactNode;
   collapsibleBottomToolBar?: boolean;
-  containerStyle?: ViewStyle;
+  styles?: {
+    containerStyle?: ViewStyle;
+    coverStyle?: ViewStyle;
+    topToolBarStyle?: ViewStyle;
+  };
+  onHeaderHeightChange: (height: number) => void;
+  TopToolbar?: React.ReactNode;
+  CollapsibleHeader: React.ReactNode;
+  StickyHeader?: React.ReactNode;
+  BottomToolBar?: React.ReactNode;
 }
 
-export const CollapsibleStickyHeader = forwardRef(
-  (props: CollapsibleStickyHeaderProps, ref) => {
+export const AnimatedHeaderContainer = forwardRef(
+  (props: AnimatedHeaderContainerProps, ref) => {
     const {
-      containerStyle,
+      styles,
       animatedScrollY,
       CollapsibleHeader,
       TopToolbar,
@@ -65,6 +69,44 @@ export const CollapsibleStickyHeader = forwardRef(
       outputRange: [0, -collapsibleHeaderHeight],
       extrapolate: 'clamp',
     });
+
+    const animationBackgroundColor =
+      collapsibleHeaderHeight > 0
+        ? animatedScrollY.interpolate({
+            inputRange:
+              Platform.OS === 'android'
+                ? [
+                    -collapsibleHeaderHeight,
+                    0,
+                    stickyHeaderOffsetY,
+                    collapsibleHeaderHeight,
+                    // AOS 에뮬레이터에서 색상 애니메이션 적용 버그 있어서 임의로 추가
+                    collapsibleHeaderHeight,
+                  ]
+                : [
+                    -collapsibleHeaderHeight,
+                    0,
+                    stickyHeaderOffsetY,
+                    collapsibleHeaderHeight,
+                  ],
+            outputRange:
+              Platform.OS === 'android'
+                ? [
+                    'rgba(255, 255, 255, 1)',
+                    'rgba(255, 255, 255, 1)',
+                    'rgba(255, 255, 255, 1)',
+                    'rgba(0, 0, 0, 1)',
+                    'rgba(0, 0, 0, 1)',
+                  ]
+                : [
+                    'rgba(255, 255, 255, 1)',
+                    'rgba(255, 255, 255, 1)',
+                    'rgba(255, 255, 255, 1)',
+                    'rgba(0, 0, 0, 1)',
+                  ], // Change these colors to your desired initial and final colors
+            extrapolate: 'clamp',
+          })
+        : 'rgba(255, 255, 255, 1)';
 
     useEffect(() => {
       const id = animatedScrollY.addListener((state) => {
@@ -135,20 +177,37 @@ export const CollapsibleStickyHeader = forwardRef(
             width: '100%',
             zIndex: 1,
           },
-          containerStyle,
+          styles?.containerStyle,
         ]}
       >
-        {/* Sticky Header에 offset이 적용되었을 때, Header 뒤에 있는 요소 안 보이게 처리 */}
+        {/* Cover, Sticky Header에 offset이 적용되었을 때, Header 뒤에 있는 요소 안 보이게 처리 */}
         <View
-          style={{
-            position: 'absolute',
-            height: stickyHeaderOffsetY,
-            width: '100%',
-            backgroundColor: 'red',
-          }}
+          style={[
+            {
+              position: 'absolute',
+              height: stickyHeaderOffsetY,
+              width: '100%',
+              backgroundColor: 'white',
+            },
+            styles?.coverStyle,
+          ]}
         />
         {/* Top Header */}
-        {TopToolbar}
+        {TopToolbar && (
+          <Animated.View
+            style={[
+              {
+                backgroundColor: animationBackgroundColor,
+                position: 'absolute',
+                width: '100%',
+                zIndex: 3,
+              },
+              styles?.topToolBarStyle,
+            ]}
+          >
+            {TopToolbar}
+          </Animated.View>
+        )}
 
         {/* Collapsible Header */}
         <Animated.View

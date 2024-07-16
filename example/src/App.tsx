@@ -6,9 +6,8 @@ import {
   Dimensions,
   type NativeSyntheticEvent,
   type NativeScrollEvent,
-  Platform,
 } from 'react-native';
-import { CollapsibleStickyHeader } from 'react-native-header-components';
+import { AnimatedHeaderContainer } from 'react-native-header-components';
 import { useRef, useState } from 'react';
 import PagerView from 'react-native-pager-view';
 
@@ -19,11 +18,10 @@ export default function App() {
 
   // collapsibleHeaderHeight을 이용하여 FlatList의 paddingTop을 설정합니다!
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
-  const collapsibleStickyHeaderOnlyRNRef = useRef<{
+  const animatedHeaderContainerRef = useRef<{
     expand: (value: number) => void;
     collapse: () => void;
   }>(null);
-  const stickyHeaderOffsetY = 60;
   // viewPager, TODO: 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
   const tabCount = 3;
@@ -35,44 +33,6 @@ export default function App() {
     }, {})
   );
   const isScrollingRef = useRef(false);
-
-  const animationBackgroundColor =
-    collapsibleHeaderHeight > 0
-      ? animatedScrollY.interpolate({
-          inputRange:
-            Platform.OS === 'android'
-              ? [
-                  -collapsibleHeaderHeight,
-                  0,
-                  stickyHeaderOffsetY,
-                  collapsibleHeaderHeight,
-                  // AOS 에뮬레이터에서 색상 애니메이션 적용 버그 있어서 임의로 추가
-                  collapsibleHeaderHeight,
-                ]
-              : [
-                  -collapsibleHeaderHeight,
-                  0,
-                  stickyHeaderOffsetY,
-                  collapsibleHeaderHeight,
-                ],
-          outputRange:
-            Platform.OS === 'android'
-              ? [
-                  'rgba(255, 255, 255, 1)',
-                  'rgba(255, 255, 255, 1)',
-                  'rgba(255, 255, 255, 1)',
-                  'rgba(0, 0, 0, 1)',
-                  'rgba(0, 0, 0, 1)',
-                ]
-              : [
-                  'rgba(255, 255, 255, 1)',
-                  'rgba(255, 255, 255, 1)',
-                  'rgba(255, 255, 255, 1)',
-                  'rgba(0, 0, 0, 1)',
-                ], // Change these colors to your desired initial and final colors
-          extrapolate: 'clamp',
-        })
-      : 'rgba(255, 255, 255, 1)';
 
   // Animated.event 내에서 갱신 된 값 참조 불가하여, 일반 함수로 변경
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -91,23 +51,20 @@ export default function App() {
         backgroundColor: 'gray',
       }}
     >
-      <CollapsibleStickyHeader
-        ref={collapsibleStickyHeaderOnlyRNRef}
+      <AnimatedHeaderContainer
+        ref={animatedHeaderContainerRef}
         animatedScrollY={animatedScrollY}
-        onHeaderHeightChange={setCollapsibleHeaderHeight} // Add this line
+        onHeaderHeightChange={setCollapsibleHeaderHeight}
+        styles={{
+          topToolBarStyle: { paddingTop: 40 },
+        }}
         TopToolbar={
-          <Animated.View
+          <View
             style={{
-              paddingTop: stickyHeaderOffsetY,
-              alignSelf: 'stretch',
-              backgroundColor: animationBackgroundColor,
-              flex: 1,
               flexDirection: 'row',
+              padding: 16,
+              alignSelf: 'stretch',
               justifyContent: 'space-between',
-              paddingHorizontal: 16,
-              position: 'absolute',
-              width: '100%',
-              zIndex: 3,
             }}
           >
             <Pressable onPress={() => console.log('Left')}>
@@ -121,7 +78,7 @@ export default function App() {
                 Right
               </Text>
             </Pressable>
-          </Animated.View>
+          </View>
         }
         CollapsibleHeader={
           <Pressable
@@ -142,7 +99,7 @@ export default function App() {
             </View>
           </Pressable>
         }
-        stickyHeaderOffsetY={stickyHeaderOffsetY + 30}
+        stickyHeaderOffsetY={100}
         StickyHeader={
           <View style={{ flexDirection: 'row' }}>
             {new Array(tabCount).fill(0).map((_, index) => (
@@ -162,12 +119,12 @@ export default function App() {
                     // @ts-ignore
                     flatListScrollYsRef.current[index] < collapsibleHeaderHeight
                   ) {
-                    collapsibleStickyHeaderOnlyRNRef.current?.expand(
+                    animatedHeaderContainerRef.current?.expand(
                       // @ts-ignore
                       flatListScrollYsRef.current[index]
                     );
                   } else {
-                    collapsibleStickyHeaderOnlyRNRef.current?.collapse(
+                    animatedHeaderContainerRef.current?.collapse(
                       // @ts-ignore
                       flatListScrollYsRef.current[index]
                     );
@@ -267,12 +224,12 @@ export default function App() {
             // @ts-ignore
             flatListScrollYsRef.current[position] < collapsibleHeaderHeight
           ) {
-            collapsibleStickyHeaderOnlyRNRef.current?.expand(
+            animatedHeaderContainerRef.current?.expand(
               // @ts-ignore
               flatListScrollYsRef.current[position]
             );
           } else {
-            collapsibleStickyHeaderOnlyRNRef.current?.collapse(
+            animatedHeaderContainerRef.current?.collapse(
               // @ts-ignore
               flatListScrollYsRef.current[position]
             );
