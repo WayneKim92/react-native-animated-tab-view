@@ -94,7 +94,6 @@ export const CollapsibleStickyHeader = forwardRef(
         } else if (deltaY > 0) {
           direction = 'down';
         }
-        console.log({ direction });
         if (direction !== null && currentScrollY > collapsibleHeaderHeight) {
           setVisibleCollapsibleBottomToolBar(direction === 'up');
         }

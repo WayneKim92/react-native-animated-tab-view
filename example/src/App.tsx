@@ -12,8 +12,10 @@ import { useRef, useState } from 'react';
 import PagerView from 'react-native-pager-view';
 
 export default function App() {
-  const animationListScrollY = useRef(new Animated.Value(0)).current;
-  const animationPagerViewScrollX = useRef(new Animated.Value(0)).current;
+  const animatedScrollY = useRef(new Animated.Value(0)).current;
+  // const animationScrollX = useRef(new Animated.Value(0)).current;
+  const animationActiveTabPosition = useRef(new Animated.Value(0)).current;
+
   // collapsibleHeaderHeight을 이용하여 FlatList의 paddingTop을 설정합니다!
   const [collapsibleHeaderHeight, setCollapsibleHeaderHeight] = useState(0);
   const collapsibleStickyHeaderOnlyRNRef = useRef<{
@@ -54,24 +56,15 @@ export default function App() {
   //     : 'rgba(255, 255, 255, 1)';
 
   // Animated.event 내에서 갱신 된 값 참조 불가하여, 일반 함수로 변경
-  const onListScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { y } = event.nativeEvent.contentOffset;
     // @ts-ignore
     flatListScrollYsRef.current[tabIndexRef.current] = y;
-    animationListScrollY.setValue(y);
+    animatedScrollY.setValue(y);
     isScrollingRef.current = true;
 
     console.log(flatListScrollYsRef.current);
   };
-
-  const bottomToolBarTranslateX = animationPagerViewScrollX.interpolate({
-    inputRange: [0, 1, 2],
-    outputRange: [
-      0,
-      -Dimensions.get('window').width,
-      -Dimensions.get('window').width * 2,
-    ],
-  });
 
   // @ts-ignore
   return (
@@ -83,7 +76,7 @@ export default function App() {
     >
       <CollapsibleStickyHeader
         ref={collapsibleStickyHeaderOnlyRNRef}
-        animatedScrollY={animationListScrollY}
+        animatedScrollY={animatedScrollY}
         onHeaderHeightChange={setCollapsibleHeaderHeight} // Add this line
         // TopToolbar={
         //   <Animated.View
@@ -186,7 +179,7 @@ export default function App() {
                 bottom: 0,
                 transform: [
                   {
-                    translateX: animationPagerViewScrollX.interpolate({
+                    translateX: animationActiveTabPosition.interpolate({
                       inputRange: [0, 1, 2],
                       outputRange: [
                         0,
@@ -204,14 +197,14 @@ export default function App() {
           <Animated.View
             style={{
               flexDirection: 'row',
-              transform: [{ translateX: bottomToolBarTranslateX }],
+              // transform: [{ translateX: animationScrollX }],
             }}
           >
             {new Array(3).fill(0).map((_, index) => {
               const colorMap = {
                 '0': '#1fd1b6',
-                '1': '#51bdad',
-                '2': '#8fb5ae',
+                '1': '#2c4b9a',
+                '2': '#ae2b76',
               };
 
               // @ts-ignore
@@ -250,6 +243,8 @@ export default function App() {
         onPageSelected={(event) => {
           const { position } = event.nativeEvent;
           tabIndexRef.current = position;
+          // animationScrollX.setValue(Dimensions.get('window').width * position);
+          animationActiveTabPosition.setValue(position);
 
           if (
             // @ts-ignore
@@ -268,7 +263,7 @@ export default function App() {
         }}
         onPageScroll={(e) => {
           const { position, offset } = e.nativeEvent;
-          animationPagerViewScrollX.setValue(position + offset);
+          animationActiveTabPosition.setValue(position + offset);
         }}
       >
         <Animated.FlatList
@@ -277,7 +272,7 @@ export default function App() {
             backgroundColor: 'gray',
             paddingTop: collapsibleHeaderHeight,
           }}
-          onScroll={onListScroll}
+          onScroll={onScroll}
           onMomentumScrollEnd={() => {
             isScrollingRef.current = false;
           }}
@@ -306,7 +301,7 @@ export default function App() {
             backgroundColor: 'gray',
             paddingTop: collapsibleHeaderHeight,
           }}
-          onScroll={onListScroll}
+          onScroll={onScroll}
           onMomentumScrollEnd={() => {
             isScrollingRef.current = false;
           }}
@@ -335,7 +330,7 @@ export default function App() {
             backgroundColor: 'gray',
             paddingTop: collapsibleHeaderHeight,
           }}
-          onScroll={onListScroll}
+          onScroll={onScroll}
           onMomentumScrollEnd={() => {
             isScrollingRef.current = false;
           }}
