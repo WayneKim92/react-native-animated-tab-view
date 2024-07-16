@@ -304,6 +304,7 @@ export default function App() {
 
           return (
             <Animated.FlatList
+              key={index}
               data={new Array(100).fill(0)}
               contentContainerStyle={{
                 backgroundColor: 'gray',
