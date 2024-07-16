@@ -27,7 +27,7 @@ export default function App() {
   // viewPager 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의함
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
 
-  const tabIndexRef = useRef<number>(0);
+  const activeTabIndexRef = useRef<number>(0);
   const flatListScrollYsRef = useRef(
     new Array(TabCount).fill(0).reduce((acc, _, index) => {
       acc[index] = 0;
@@ -77,7 +77,7 @@ export default function App() {
   // Animated.event 내에서 갱신 된 값 참조 불가하여, 일반 함수로 변경
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { y } = event.nativeEvent.contentOffset;
-    flatListScrollYsRef.current[tabIndexRef.current] = y;
+    flatListScrollYsRef.current[activeTabIndexRef.current] = y;
     animatedScrollY.setValue(y);
   };
 
@@ -230,7 +230,7 @@ export default function App() {
         style={{ flex: 1 }}
         onPageSelected={(event) => {
           const { position } = event.nativeEvent;
-          tabIndexRef.current = position;
+          activeTabIndexRef.current = position;
           animationScrollX.setValue(-Dimensions.get('window').width * position);
 
           if (flatListScrollYsRef.current[position] < collapsibleHeaderHeight) {
