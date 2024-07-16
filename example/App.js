@@ -1,1 +1,1 @@
-export { default } from './src/AppRN';
+export { default } from './src/App';

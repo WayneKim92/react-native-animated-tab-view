@@ -1,22 +1,18 @@
-# react-native-header-components
-
-Various types of header components (collapsible, sticky, and more)
+# react-native-compound-tab-view
 
 ## Installation
 
 ```sh
-npm install react-native-header-components
+npm install react-native-compound-tab-view
+#or
+yarn add react-native-compound-tab-view
 ```
 
 ## Usage
 
 
 ```js
-import { multiply } from 'react-native-header-components';
-
-// ...
-
-const result = await multiply(3, 7);
+# 준비 중
 ```
 
 
