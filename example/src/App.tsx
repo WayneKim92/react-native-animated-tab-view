@@ -13,7 +13,7 @@ import PagerView from 'react-native-pager-view';
 
 export default function App() {
   const animatedScrollY = useRef(new Animated.Value(0)).current;
-  // const animationScrollX = useRef(new Animated.Value(0)).current;
+  const animationScrollX = useRef(new Animated.Value(0)).current;
   const animationActiveTabPosition = useRef(new Animated.Value(0)).current;
 
   // collapsibleHeaderHeight을 이용하여 FlatList의 paddingTop을 설정합니다!
@@ -22,7 +22,7 @@ export default function App() {
     expand: (value: number) => void;
     collapse: () => void;
   }>(null);
-  // const stickyHeaderOffsetY = Platform.OS === 'ios' ? 120 : 100;
+  const stickyHeaderOffsetY = 60;
   // viewPager, TODO: 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
   const tabIndexRef = useRef<number>(0);
@@ -33,27 +33,27 @@ export default function App() {
   });
   const isScrollingRef = useRef(false);
 
-  // const animationBackgroundColor =
-  //   collapsibleHeaderHeight > 0
-  //     ? animationListScrollY.interpolate({
-  //         inputRange: [
-  //           -collapsibleHeaderHeight,
-  //           0,
-  //           stickyHeaderOffsetY,
-  //           collapsibleHeaderHeight,
-  //           // AOS 에뮬레이터에서 색상 애니메이션 적용 버그 있어서 임의로 추가
-  //           collapsibleHeaderHeight,
-  //         ],
-  //         outputRange: [
-  //           'rgba(255, 255, 255, 1)',
-  //           'rgba(255, 255, 255, 1)',
-  //           'rgba(255, 255, 255, 1)',
-  //           'rgba(0, 0, 0, 1)',
-  //           'rgba(0, 0, 0, 1)',
-  //         ], // Change these colors to your desired initial and final colors
-  //         extrapolate: 'clamp',
-  //       })
-  //     : 'rgba(255, 255, 255, 1)';
+  const animationBackgroundColor =
+    collapsibleHeaderHeight > 0
+      ? animatedScrollY.interpolate({
+          inputRange: [
+            -collapsibleHeaderHeight,
+            0,
+            stickyHeaderOffsetY,
+            collapsibleHeaderHeight,
+            // AOS 에뮬레이터에서 색상 애니메이션 적용 버그 있어서 임의로 추가
+            collapsibleHeaderHeight,
+          ],
+          outputRange: [
+            'rgba(255, 255, 255, 1)',
+            'rgba(255, 255, 255, 1)',
+            'rgba(255, 255, 255, 1)',
+            'rgba(0, 0, 0, 1)',
+            'rgba(0, 0, 0, 1)',
+          ], // Change these colors to your desired initial and final colors
+          extrapolate: 'clamp',
+        })
+      : 'rgba(255, 255, 255, 1)';
 
   // Animated.event 내에서 갱신 된 값 참조 불가하여, 일반 함수로 변경
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -78,33 +78,34 @@ export default function App() {
         ref={collapsibleStickyHeaderOnlyRNRef}
         animatedScrollY={animatedScrollY}
         onHeaderHeightChange={setCollapsibleHeaderHeight} // Add this line
-        // TopToolbar={
-        //   <Animated.View
-        //     style={{
-        //       alignSelf: 'stretch',
-        //       backgroundColor: animationBackgroundColor,
-        //       flex: 1,
-        //       flexDirection: 'row',
-        //       justifyContent: 'space-between',
-        //       paddingHorizontal: 16,
-        //       position: 'absolute',
-        //       width: '100%',
-        //       zIndex: 3,
-        //     }}
-        //   >
-        //     <Pressable onPress={() => console.log('Left')}>
-        //       <Text style={{ backgroundColor: 'green', padding: 8 }}>Left</Text>
-        //     </Pressable>
-        //     <Text style={{ backgroundColor: 'green', padding: 8 }}>
-        //       Top Header
-        //     </Text>
-        //     <Pressable onPress={() => console.log('Right')}>
-        //       <Text style={{ backgroundColor: 'green', padding: 8 }}>
-        //         Right
-        //       </Text>
-        //     </Pressable>
-        //   </Animated.View>
-        // }
+        TopToolbar={
+          <Animated.View
+            style={{
+              paddingTop: stickyHeaderOffsetY,
+              alignSelf: 'stretch',
+              backgroundColor: animationBackgroundColor,
+              flex: 1,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              paddingHorizontal: 16,
+              position: 'absolute',
+              width: '100%',
+              zIndex: 3,
+            }}
+          >
+            <Pressable onPress={() => console.log('Left')}>
+              <Text style={{ backgroundColor: 'green', padding: 8 }}>Left</Text>
+            </Pressable>
+            <Text style={{ backgroundColor: 'green', padding: 8 }}>
+              Top Header
+            </Text>
+            <Pressable onPress={() => console.log('Right')}>
+              <Text style={{ backgroundColor: 'green', padding: 8 }}>
+                Right
+              </Text>
+            </Pressable>
+          </Animated.View>
+        }
         CollapsibleHeader={
           <Pressable
             onPress={() => {
@@ -124,7 +125,7 @@ export default function App() {
             </View>
           </Pressable>
         }
-        // stickyHeaderOffsetY={stickyHeaderOffsetY}
+        stickyHeaderOffsetY={stickyHeaderOffsetY + 30}
         StickyHeader={
           <View style={{ flexDirection: 'row' }}>
             {new Array(3).fill(0).map((_, index) => (
@@ -197,7 +198,7 @@ export default function App() {
           <Animated.View
             style={{
               flexDirection: 'row',
-              // transform: [{ translateX: animationScrollX }],
+              transform: [{ translateX: animationScrollX }],
             }}
           >
             {new Array(3).fill(0).map((_, index) => {
@@ -243,8 +244,7 @@ export default function App() {
         onPageSelected={(event) => {
           const { position } = event.nativeEvent;
           tabIndexRef.current = position;
-          // animationScrollX.setValue(Dimensions.get('window').width * position);
-          animationActiveTabPosition.setValue(position);
+          animationScrollX.setValue(-Dimensions.get('window').width * position);
 
           if (
             // @ts-ignore
