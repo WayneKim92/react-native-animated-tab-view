@@ -8,7 +8,7 @@ import React, {
 import { Animated, View, type ViewStyle } from 'react-native';
 
 interface CollapsibleStickyHeaderProps {
-  animationScrollY: Animated.Value;
+  animatedScrollY: Animated.Value;
   onHeaderHeightChange: (height: number) => void;
   CollapsibleHeader: React.ReactNode;
   TopToolbar?: React.ReactNode;
@@ -23,7 +23,7 @@ export const CollapsibleStickyHeader = forwardRef(
   (props: CollapsibleStickyHeaderProps, ref) => {
     const {
       containerStyle,
-      animationScrollY,
+      animatedScrollY,
       CollapsibleHeader,
       TopToolbar,
       StickyHeader,
@@ -48,14 +48,14 @@ export const CollapsibleStickyHeader = forwardRef(
 
     useImperativeHandle(ref, () => ({
       expand: (lastValue: number) => {
-        Animated.timing(animationScrollY, {
+        Animated.timing(animatedScrollY, {
           toValue: lastValue, // Assuming 0 is the expanded state
           duration: 200,
           useNativeDriver: true,
         }).start();
       },
       collapse: () => {
-        Animated.timing(animationScrollY, {
+        Animated.timing(animatedScrollY, {
           toValue: collapsibleHeaderHeight, // Assuming 0 is the expanded state
           duration: 200,
           useNativeDriver: true,
@@ -63,14 +63,14 @@ export const CollapsibleStickyHeader = forwardRef(
       },
     }));
 
-    const collapsibleHeaderHeaderTranslateY = animationScrollY.interpolate({
+    const collapsibleHeaderHeaderTranslateY = animatedScrollY.interpolate({
       inputRange: [0, collapsibleHeaderHeight],
       outputRange: [0, -collapsibleHeaderHeight],
       extrapolate: 'clamp',
     });
 
     useEffect(() => {
-      const id = animationScrollY.addListener((state) => {
+      const id = animatedScrollY.addListener((state) => {
         const currentScrollY = state.value;
 
         // Sticky Header 처리 로직
@@ -94,16 +94,17 @@ export const CollapsibleStickyHeader = forwardRef(
         } else if (deltaY > 0) {
           direction = 'down';
         }
+        console.log({ direction });
         if (direction !== null && currentScrollY > collapsibleHeaderHeight) {
           setVisibleCollapsibleBottomToolBar(direction === 'up');
         }
       });
 
       return () => {
-        animationScrollY.removeListener(id);
+        animatedScrollY.removeListener(id);
       };
     }, [
-      animationScrollY,
+      animatedScrollY,
       collapsibleHeaderHeight,
       lastScrollY,
       stickyHeaderHeaderTranslateY,

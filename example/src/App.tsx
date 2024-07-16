@@ -83,7 +83,7 @@ export default function App() {
     >
       <CollapsibleStickyHeader
         ref={collapsibleStickyHeaderOnlyRNRef}
-        animationScrollY={animationListScrollY}
+        animatedScrollY={animationListScrollY}
         onHeaderHeightChange={setCollapsibleHeaderHeight} // Add this line
         // TopToolbar={
         //   <Animated.View
