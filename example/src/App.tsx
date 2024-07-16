@@ -79,8 +79,6 @@ export default function App() {
     flatListScrollYsRef.current[tabIndexRef.current] = y;
     animatedScrollY.setValue(y);
     isScrollingRef.current = true;
-
-    console.log(flatListScrollYsRef.current);
   };
 
   // @ts-ignore

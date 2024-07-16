@@ -40,11 +40,8 @@ export const CollapsibleStickyHeader = forwardRef(
 
     const [toolBarHeight, setToolBarHeight] = useState(0);
     const toolbarTranslateY = useRef(new Animated.Value(0)).current;
-    const [
-      visibleCollapsibleBottomToolBar,
-      setVisibleCollapsibleBottomToolBar,
-    ] = useState(true);
-    const [lastScrollY, setLastScrollY] = useState(0);
+    const isToolbarTranslateYAnimationRunning = useRef(false);
+    const lastScrollYRef = useRef(0);
 
     useImperativeHandle(ref, () => ({
       expand: (lastValue: number) => {
@@ -86,16 +83,28 @@ export const CollapsibleStickyHeader = forwardRef(
         );
 
         // Collapsible Toolbar 처리 로직
-        const deltaY = currentScrollY - lastScrollY;
-        setLastScrollY(currentScrollY);
+        const deltaY = Math.round(currentScrollY - lastScrollYRef.current);
+        lastScrollYRef.current = currentScrollY;
         let direction = null;
         if (deltaY < 0) {
           direction = 'up';
         } else if (deltaY > 0) {
           direction = 'down';
         }
+
         if (direction !== null && currentScrollY > collapsibleHeaderHeight) {
-          setVisibleCollapsibleBottomToolBar(direction === 'up');
+          if (isToolbarTranslateYAnimationRunning.current) {
+            return;
+          }
+          isToolbarTranslateYAnimationRunning.current = true;
+
+          Animated.timing(toolbarTranslateY, {
+            toValue: direction === 'up' ? 0 : -toolBarHeight,
+            duration: 300,
+            useNativeDriver: true,
+          }).start(() => {
+            isToolbarTranslateYAnimationRunning.current = false;
+          });
         }
       });
 
@@ -105,26 +114,11 @@ export const CollapsibleStickyHeader = forwardRef(
     }, [
       animatedScrollY,
       collapsibleHeaderHeight,
-      lastScrollY,
       stickyHeaderHeaderTranslateY,
       stickyHeaderOffsetY,
+      toolBarHeight,
+      toolbarTranslateY,
     ]);
-
-    useEffect(() => {
-      if (visibleCollapsibleBottomToolBar) {
-        Animated.timing(toolbarTranslateY, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
-      } else {
-        Animated.timing(toolbarTranslateY, {
-          toValue: -toolBarHeight,
-          duration: 300,
-          useNativeDriver: true,
-        }).start();
-      }
-    }, [visibleCollapsibleBottomToolBar, toolBarHeight, toolbarTranslateY]);
 
     useEffect(() => {
       if (onHeaderHeightChange) {
