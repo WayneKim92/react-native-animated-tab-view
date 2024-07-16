@@ -6,6 +6,7 @@ import {
   Dimensions,
   type NativeSyntheticEvent,
   type NativeScrollEvent,
+  Platform,
 } from 'react-native';
 import { AnimatedHeaderContainer } from 'react-native-header-components';
 import { useRef, useState } from 'react';
@@ -34,6 +35,45 @@ export default function App() {
   );
   const isScrollingRef = useRef(false);
 
+  const stickyHeaderOffsetY = 100;
+  const animationBackgroundColor =
+    collapsibleHeaderHeight > 0
+      ? animatedScrollY.interpolate({
+          inputRange:
+            Platform.OS === 'android'
+              ? [
+                  -collapsibleHeaderHeight,
+                  0,
+                  stickyHeaderOffsetY,
+                  collapsibleHeaderHeight,
+                  // AOS 에뮬레이터에서 색상 애니메이션 적용 버그 있어서 임의로 추가
+                  collapsibleHeaderHeight,
+                ]
+              : [
+                  -collapsibleHeaderHeight,
+                  0,
+                  stickyHeaderOffsetY,
+                  collapsibleHeaderHeight,
+                ],
+          outputRange:
+            Platform.OS === 'android'
+              ? [
+                  'rgba(255, 255, 255, 1)',
+                  'rgba(255, 255, 255, 1)',
+                  'rgba(255, 255, 255, 1)',
+                  'rgba(0, 0, 0, 1)',
+                  'rgba(0, 0, 0, 1)',
+                ]
+              : [
+                  'rgba(255, 255, 255, 1)',
+                  'rgba(255, 255, 255, 1)',
+                  'rgba(255, 255, 255, 1)',
+                  'rgba(0, 0, 0, 1)',
+                ], // Change these colors to your desired initial and final colors
+          extrapolate: 'clamp',
+        })
+      : 'rgba(255, 255, 255, 1)';
+
   // Animated.event 내에서 갱신 된 값 참조 불가하여, 일반 함수로 변경
   const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { y } = event.nativeEvent.contentOffset;
@@ -56,7 +96,10 @@ export default function App() {
         animatedScrollY={animatedScrollY}
         onHeaderHeightChange={setCollapsibleHeaderHeight}
         styles={{
-          topToolBarStyle: { paddingTop: 40 },
+          topToolBarStyle: {
+            paddingTop: 40,
+            backgroundColor: animationBackgroundColor,
+          },
         }}
         TopToolbar={
           <View
@@ -99,7 +142,7 @@ export default function App() {
             </View>
           </Pressable>
         }
-        stickyHeaderOffsetY={100}
+        stickyHeaderOffsetY={stickyHeaderOffsetY}
         StickyHeader={
           <View style={{ flexDirection: 'row' }}>
             {new Array(tabCount).fill(0).map((_, index) => (

@@ -5,16 +5,16 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Animated, Platform, View, type ViewStyle } from 'react-native';
+import { Animated, View, type ViewStyle } from 'react-native';
 
 interface AnimatedHeaderContainerProps {
   animatedScrollY: Animated.Value;
   stickyHeaderOffsetY?: number;
   collapsibleBottomToolBar?: boolean;
   styles?: {
-    containerStyle?: ViewStyle;
-    coverStyle?: ViewStyle;
-    topToolBarStyle?: ViewStyle;
+    containerStyle?: Animated.WithAnimatedValue<ViewStyle>;
+    coverStyle?: Animated.WithAnimatedValue<ViewStyle>;
+    topToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
   };
   onHeaderHeightChange: (height: number) => void;
   TopToolbar?: React.ReactNode;
@@ -69,44 +69,6 @@ export const AnimatedHeaderContainer = forwardRef(
       outputRange: [0, -collapsibleHeaderHeight],
       extrapolate: 'clamp',
     });
-
-    const animationBackgroundColor =
-      collapsibleHeaderHeight > 0
-        ? animatedScrollY.interpolate({
-            inputRange:
-              Platform.OS === 'android'
-                ? [
-                    -collapsibleHeaderHeight,
-                    0,
-                    stickyHeaderOffsetY,
-                    collapsibleHeaderHeight,
-                    // AOS 에뮬레이터에서 색상 애니메이션 적용 버그 있어서 임의로 추가
-                    collapsibleHeaderHeight,
-                  ]
-                : [
-                    -collapsibleHeaderHeight,
-                    0,
-                    stickyHeaderOffsetY,
-                    collapsibleHeaderHeight,
-                  ],
-            outputRange:
-              Platform.OS === 'android'
-                ? [
-                    'rgba(255, 255, 255, 1)',
-                    'rgba(255, 255, 255, 1)',
-                    'rgba(255, 255, 255, 1)',
-                    'rgba(0, 0, 0, 1)',
-                    'rgba(0, 0, 0, 1)',
-                  ]
-                : [
-                    'rgba(255, 255, 255, 1)',
-                    'rgba(255, 255, 255, 1)',
-                    'rgba(255, 255, 255, 1)',
-                    'rgba(0, 0, 0, 1)',
-                  ], // Change these colors to your desired initial and final colors
-            extrapolate: 'clamp',
-          })
-        : 'rgba(255, 255, 255, 1)';
 
     useEffect(() => {
       const id = animatedScrollY.addListener((state) => {
@@ -181,7 +143,7 @@ export const AnimatedHeaderContainer = forwardRef(
         ]}
       >
         {/* Cover, Sticky Header에 offset이 적용되었을 때, Header 뒤에 있는 요소 안 보이게 처리 */}
-        <View
+        <Animated.View
           style={[
             {
               position: 'absolute',
@@ -197,7 +159,6 @@ export const AnimatedHeaderContainer = forwardRef(
           <Animated.View
             style={[
               {
-                backgroundColor: animationBackgroundColor,
                 position: 'absolute',
                 width: '100%',
                 zIndex: 3,
