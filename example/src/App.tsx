@@ -26,12 +26,14 @@ export default function App() {
   const stickyHeaderOffsetY = 60;
   // viewPager, TODO: 라이브러리에 참조 타입에 대한 정의 없어서 임의로 정의
   const pagerViewRef = useRef<{ setPage: (index: number) => void }>(null);
+  const tabCount = 3;
   const tabIndexRef = useRef<number>(0);
-  const flatListScrollYsRef = useRef({
-    0: 0,
-    1: 0,
-    2: 0,
-  });
+  const flatListScrollYsRef = useRef(
+    new Array(tabCount).fill(0).reduce((acc, _, index) => {
+      acc[index] = 0;
+      return acc;
+    }, {})
+  );
   const isScrollingRef = useRef(false);
 
   const animationBackgroundColor =
@@ -143,7 +145,7 @@ export default function App() {
         stickyHeaderOffsetY={stickyHeaderOffsetY + 30}
         StickyHeader={
           <View style={{ flexDirection: 'row' }}>
-            {new Array(3).fill(0).map((_, index) => (
+            {new Array(tabCount).fill(0).map((_, index) => (
               <Pressable
                 key={index}
                 onPress={() => {
@@ -176,7 +178,7 @@ export default function App() {
                   style={{
                     alignItems: 'center',
                     justifyContent: 'center',
-                    width: Dimensions.get('window').width / 3,
+                    width: Dimensions.get('window').width / tabCount,
                     height: 60,
                     backgroundColor: 'gray',
                   }}
@@ -187,7 +189,7 @@ export default function App() {
             ))}
             <Animated.View
               style={{
-                width: Dimensions.get('window').width / 3,
+                width: Dimensions.get('window').width / tabCount,
                 height: 5,
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 position: 'absolute',
@@ -199,8 +201,8 @@ export default function App() {
                       inputRange: [0, 1, 2],
                       outputRange: [
                         0,
-                        Dimensions.get('window').width / 3,
-                        (Dimensions.get('window').width / 3) * 2,
+                        Dimensions.get('window').width / tabCount,
+                        (Dimensions.get('window').width / tabCount) * 2,
                       ],
                     }),
                   },
@@ -216,7 +218,7 @@ export default function App() {
               transform: [{ translateX: animationScrollX }],
             }}
           >
-            {new Array(3).fill(0).map((_, index) => {
+            {new Array(tabCount).fill(0).map((_, index) => {
               const colorMap = {
                 '0': '#1fd1b6',
                 '1': '#2c4b9a',
@@ -281,93 +283,56 @@ export default function App() {
           animationActiveTabPosition.setValue(position + offset);
         }}
       >
-        <Animated.FlatList
-          data={new Array(100).fill(0)}
-          contentContainerStyle={{
-            backgroundColor: 'gray',
-            paddingTop: collapsibleHeaderHeight,
-          }}
-          onScroll={onScroll}
-          onMomentumScrollEnd={() => {
-            isScrollingRef.current = false;
-          }}
-          renderItem={({ index }) => {
-            type ColorIndex = 0 | 1 | 2;
-            const colorIndex: ColorIndex = (index % 3) as ColorIndex;
-
-            const colorMap = {
+        {new Array(tabCount).fill(0).map((_, index) => {
+          const colorMaps = [
+            {
               '0': '#d11f1f',
               '1': '#c65252',
               '2': '#f89797',
-            };
-
-            return (
-              <Pressable onPress={() => console.log(index)}>
-                <View
-                  style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
-                />
-              </Pressable>
-            );
-          }}
-        />
-        <Animated.FlatList
-          data={new Array(100).fill(0)}
-          contentContainerStyle={{
-            backgroundColor: 'gray',
-            paddingTop: collapsibleHeaderHeight,
-          }}
-          onScroll={onScroll}
-          onMomentumScrollEnd={() => {
-            isScrollingRef.current = false;
-          }}
-          renderItem={({ index }) => {
-            type ColorIndex = 0 | 1 | 2;
-            const colorIndex: ColorIndex = (index % 3) as ColorIndex;
-
-            const colorMap = {
+            },
+            {
               '0': '#1fd122',
               '1': '#40bf47',
               '2': '#85c386',
-            };
-
-            return (
-              <Pressable onPress={() => console.log(index)}>
-                <View
-                  style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
-                />
-              </Pressable>
-            );
-          }}
-        />
-        <Animated.FlatList
-          data={new Array(100).fill(0)}
-          contentContainerStyle={{
-            backgroundColor: 'gray',
-            paddingTop: collapsibleHeaderHeight,
-          }}
-          onScroll={onScroll}
-          onMomentumScrollEnd={() => {
-            isScrollingRef.current = false;
-          }}
-          renderItem={({ index }) => {
-            type ColorIndex = 0 | 1 | 2;
-            const colorIndex: ColorIndex = (index % 3) as ColorIndex;
-
-            const colorMap = {
+            },
+            {
               '0': '#1f87d1',
               '1': '#416e8e',
               '2': '#9bbedd',
-            };
+            },
+          ];
 
-            return (
-              <Pressable onPress={() => console.log(index)}>
-                <View
-                  style={{ height: 50, backgroundColor: colorMap[colorIndex] }}
-                />
-              </Pressable>
-            );
-          }}
-        />
+          return (
+            <Animated.FlatList
+              data={new Array(100).fill(0)}
+              contentContainerStyle={{
+                backgroundColor: 'gray',
+                paddingTop: collapsibleHeaderHeight,
+              }}
+              onScroll={onScroll}
+              onMomentumScrollEnd={() => {
+                isScrollingRef.current = false;
+              }}
+              renderItem={({ index: i }) => {
+                const colorMap = colorMaps[index] ?? {
+                  0: 'red',
+                  1: 'green',
+                  2: 'blue',
+                };
+                // @ts-ignore
+                const backgroundColor = colorMap[i % 3] ?? 'gray';
+
+                return (
+                  <Pressable onPress={() => console.log(index)}>
+                    <View
+                      style={{ height: 50, backgroundColor: backgroundColor }}
+                    />
+                  </Pressable>
+                );
+              }}
+            />
+          );
+        })}
       </PagerView>
     </View>
   );
