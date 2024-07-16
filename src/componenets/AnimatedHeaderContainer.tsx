@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { Animated, View, type ViewStyle } from 'react-native';
+import { Animated, type ViewStyle } from 'react-native';
 
 interface AnimatedHeaderContainerProps {
   animatedScrollY: Animated.Value;
@@ -14,8 +14,9 @@ interface AnimatedHeaderContainerProps {
     containerStyle?: Animated.WithAnimatedValue<ViewStyle>;
     coverStyle?: Animated.WithAnimatedValue<ViewStyle>;
     topToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
-    bottomToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
     stickyHeaderAndBottomToolBarContainerStyle?: Animated.WithAnimatedValue<ViewStyle>;
+    stickyHeaderStyle?: Animated.WithAnimatedValue<ViewStyle>;
+    bottomToolBarStyle?: Animated.WithAnimatedValue<ViewStyle>;
   };
   onHeaderHeightChange: (height: number) => void;
   TopToolbar?: React.ReactNode;
@@ -201,7 +202,9 @@ export const AnimatedHeaderContainer = forwardRef(
             setStickyHeaderHeight(event.nativeEvent.layout.height);
           }}
         >
-          <View style={{ zIndex: 2 }}>{StickyHeader}</View>
+          <Animated.View style={[{ zIndex: 2 }, styles?.stickyHeaderStyle]}>
+            {StickyHeader}
+          </Animated.View>
           <Animated.View
             style={[
               {
